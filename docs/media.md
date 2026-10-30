@@ -1,32 +1,38 @@
 # Cinematic media
 
-Background photos and video loops for the home page and the manifesto page. Put the files in `public/media/` with these
-exact names and redeploy. A slot only appears when its `.jpg` is there (checked when the page is built, in
-`lib/server/media.ts`), so a missing file leaves the plain black or bone section, never a broken image. A video slot
-without its `.mp4` shows the still.
+Full-bleed athlete imagery behind four sections:
 
-| File | Type | Where it shows | Shot to look for |
-|---|---|---|---|
-| `hero.jpg` + `hero.mp4` | Video loop (jpg is the still shown before/without video) | Home hero, full-bleed behind "Mentality > everything" | Runner at dawn or dusk, low angle, wide, subject on the right third (copy sits on the left) |
-| `training.jpg` + `training.mp4` | Video loop | Home, "The work no one sees" band | Training in low light: sled push, sprints, heavy lift, chalk, sweat |
-| `portrait.jpg` | Photo, 4:5 portrait | Home manifesto band (bone), right column | Athlete close-up, focused, before or after effort |
-| `relentless.jpg` | Photo | Home waitlist sign-up and the end of the manifesto page | Lone runner on an open road or track, wide, lots of dark space |
+| Section | File(s) in `public/media/` | Grade |
+|---|---|---|
+| Home hero | `run-track.webp` (still) | Full colour (`cine-color`) |
+| Home waitlist sign-up | `gym-barbell.webp` (still) | Black and white (`cine-bw`) |
+| Manifesto mid-page line | `sweat-bw.mp4` + `sweat-bw.jpg` poster (clip) | Centred (`cine-center`) |
+| Manifesto closer | `gym-sweat.webp` (still) | Black and white, mirrored so the face sits clear of the copy (`cine-bw cine-flip`) |
 
-## Specs
+The sections are in `app/[lang]/page.tsx` and `app/[lang]/manifesto/page.tsx`; the media layer is `components/CineMedia.tsx`
+(`<CineMedia still="run-track" />` or `<CineMedia clip="sweat-bw" />`). The grade is applied in CSS (`app/globals.css`,
+`.cine…`), so footage can be shot in colour. `--pos` on the section sets the focal point (`object-position`).
 
-- **Stills (`.jpg`)**: 1920 × 1080 (portrait: 1200 × 1500), under ~300 KB. For video slots use the first frame of the clip, so the switch to video is seamless.
-- **Video (`.mp4`)**: H.264, no audio, 8–15 s seamless loop, 1920 × 1080 or smaller, under ~4 MB.
-- Darker footage works best: the site adds a dark overlay and a slight desaturation so different clips match.
-- Videos only load when on screen, and never play for visitors with reduced motion or data saver on (they see the still).
-- Stills are served through `next/image`, which resizes them and serves AVIF/WebP, so a high-quality `.jpg` is fine.
+- A still is `<name>.webp`, about 2400 px wide; `next/image` resizes it and serves AVIF/WebP per screen.
+- A clip is `<name>.mp4` with a `<name>.jpg` poster (its first frame). The poster shows first; the video loads only when
+  the section nears the screen and pauses when it leaves. Visitors with reduced motion or Data Saver only see the poster.
+- Clips: 720p, 6–15 s seamless loop, muted, under ~5 MB.
+- To swap in your own shoot, replace the files keeping the names, or add new ones and change the name in the page.
+- **No visible brands:** clothing, shoes and gear in any image must show no logos.
 
 Compress a clip and grab its first frame with ffmpeg:
 
 ```bash
-ffmpeg -i in.mov -an -vf "scale=1920:-2,fps=25" -c:v libx264 -crf 28 -preset slow -movflags +faststart -t 12 hero.mp4
-ffmpeg -i hero.mp4 -frames:v 1 -q:v 4 hero.jpg
+ffmpeg -i in.mov -an -vf "scale=1280:-2,fps=25" -c:v libx264 -crf 28 -preset slow -movflags +faststart -t 12 name.mp4
 ```
 
-## Sources
+```bash
+ffmpeg -i name.mp4 -frames:v 1 -q:v 4 name.jpg
+```
 
-Your own shoot is best. For stock, [Pexels](https://www.pexels.com/videos/) and [Unsplash](https://unsplash.com) allow free commercial use without attribution; avoid footage where a visible third-party brand or a recognisable person implies endorsement.
+## Current files are placeholders
+
+- [Mixkit](https://mixkit.co/license/#videoFree) clip, free for commercial use with no attribution required: sweat-bw (50964)
+- [Unsplash](https://unsplash.com/license) stills, free for commercial use: run-track (photo-1766970096346), gym-barbell (photo-1639653816698), gym-sweat (photo-1570095354203)
+
+Replace them with your own shoot before launch, ideally with Soulset product in shot.

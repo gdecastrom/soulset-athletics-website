@@ -31,7 +31,7 @@ Los archivos viejos ya no existen. Pasa cada cambio a su lugar nuevo:
 | Lista de espera (`joinWaitlist`) | `lib/waitlist-client.ts` y `components/WaitlistForms.tsx`; el servidor en `app/api/waitlist/route.ts` |
 | `assets/css/site.css` | `app/globals.css` (mismo CSS) |
 | `assets/img/` | `public/img/` |
-| `assets/media/` (fotos y videos de fondo) | `public/media/`; los espacios están en `app/[lang]/page.tsx` y `manifesto/page.tsx` con el componente `Media` |
+| `assets/media/` (fotos y videos de fondo), `cineStill()` / `cineMedia()` | `public/media/`; las secciones están en `app/[lang]/page.tsx` y `manifesto/page.tsx` con el componente `CineMedia` |
 | `assets/js/config.js` | Ya no existe: la URL de la API es fija (`/api/waitlist`) |
 
 ## Levantar el proyecto en tu computadora
@@ -105,8 +105,7 @@ Sin `RESEND_API_KEY` no se mandan correos, pero los registros se guardan igual.
 - Tipografías: Saira Extra Condensed (títulos), Barlow (texto), IBM Plex Mono (datos de nutrición). No agregues otras.
 - **Sin líneas divisorias entre secciones.** Las líneas solo van dentro de componentes (tablas, acordeones, tarjetas).
 - En el inicio las secciones alternan negro y hueso (clase `band`). Sobre hueso, el naranja de texto se oscurece solo.
-- Fotos y videos de fondo: en `public/media/`, con los nombres de [media.md](media.md). Cada espacio aparece solo cuando su
-  archivo existe; no hace falta tocar código.
+- Fotos y videos de fondo: en `public/media/`; cómo cambiarlos, en [media.md](media.md). Nada de marcas visibles en ropa o equipo.
 - Revisa siempre en celular (390 px de ancho): nada debe hacer scroll horizontal.
 
 ## Base de datos

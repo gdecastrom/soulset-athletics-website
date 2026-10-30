@@ -1,9 +1,9 @@
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 import { Mark } from '../../../components/Logos.tsx';
-import { Media } from '../../../components/Media.tsx';
+import { CineMedia } from '../../../components/CineMedia.tsx';
 import { dict } from '../../../lib/dict.ts';
 import { href, type Lang } from '../../../lib/i18n.ts';
-import { mediaSlot, withMedia } from '../../../lib/server/media.ts';
 import { alternates, type PageProps } from '../../../lib/site.ts';
 
 export async function generateMetadata({ params }: PageProps) {
@@ -16,7 +16,6 @@ export default async function Manifesto({ params }: PageProps) {
   const lang = (await params).lang as Lang;
   const m = dict(lang).manifesto;
   const bone = { color: 'var(--bone)' };
-  const relentless = mediaSlot('relentless');
   return (
     <>
       <div className="wrap">
@@ -35,6 +34,13 @@ export default async function Manifesto({ params }: PageProps) {
           <div className="copy">{m.statement.map(p => <p key={p}>{p}</p>)}<p><b style={bone}>{m.statementBold}</b></p></div>
         </section>
       </div>
+
+      <section className="cine cine-center">
+        <CineMedia clip="sweat-bw" />
+        <div className="wrap cine-in" style={{ '--h': 'clamp(460px,72vh,760px)' } as CSSProperties}>
+          <h2 className="d-xl" style={{ maxWidth: '15ch' }}>{m.clipLine}</h2>
+        </div>
+      </section>
 
       <section className="band"><div className="wrap section" style={{ display: 'grid', gap: 20, justifyItems: 'start' }}>
         <span className="eyebrow">{m.ruleEyebrow}</span>
@@ -60,14 +66,17 @@ export default async function Manifesto({ params }: PageProps) {
         </section>
       </div>
 
-      <section className={withMedia('cine closer', relentless)}>{relentless && <Media slot={relentless} />}<div className="wrap section" style={{ display: 'grid', gap: 28, justifyItems: 'start' }}>
-        <h2 className="d-xxl">{m.endTitle}</h2>
-        <p className="lead">{m.endLead}</p>
-        <div className="hero-cta">
-          <Link className="btn btn-primary btn-l" href={href(lang, '/shop')}>{m.shop} <span className="edge">›</span></Link>
-          <Link className="btn btn-secondary btn-l" href={href(lang, '/fuel-planner')}>{m.plan}</Link>
+      <section className="cine cine-bw cine-flip" style={{ '--pos': '30% 40%' } as CSSProperties}>
+        <CineMedia still="gym-sweat" />
+        <div className="wrap cine-in">
+          <h2 className="d-xxl">{m.endTitle}</h2>
+          <p className="lead">{m.endLead}</p>
+          <div className="hero-cta">
+            <Link className="btn btn-primary btn-l" href={href(lang, '/shop')}>{m.shop} <span className="edge">›</span></Link>
+            <Link className="btn btn-secondary btn-l" href={href(lang, '/fuel-planner')}>{m.plan}</Link>
+          </div>
         </div>
-      </div></section>
+      </section>
     </>
   );
 }

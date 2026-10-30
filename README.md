@@ -52,7 +52,7 @@ select * from waitlist_pick_demand;   -- which variants people want most
 - **Interface copy** (headings, buttons, FAQ, manifesto): `lib/dict.ts`, English first, then Spanish. Spanish always addresses the visitor as *tú*. A test fails if the two languages don't have the same entries.
 - **Styles**: `app/globals.css` (design tokens at the top).
 - **Images**: `public/img/*.webp`, square 900×900 for products.
-- **Cinematic photos and video** (home hero, training band, manifesto portrait, waitlist and manifesto backgrounds): `public/media/`, names and specs in [docs/media.md](docs/media.md). Each slot appears only once its file is in the repo.
+- **Cinematic photos and video** (home hero, home waitlist sign-up, manifesto clip and closer): `public/media/`, how to swap them in [docs/media.md](docs/media.md).
 
 ## Security
 
@@ -139,7 +139,7 @@ test/                   Catalogue, copy, planner and API tests (npm test)
 - [ ] Real formulations and nutrition panels from the manufacturer
 - [ ] Final prices and currency (USD vs RD$)
 - [ ] Real product photography (current images are 3D renders)
-- [ ] Cinematic athlete footage for the home and manifesto pages (`docs/media.md` lists the files)
+- [ ] Own athlete footage to replace the placeholder photos and clip in `public/media/`, ideally with Soulset product in shot (`docs/media.md`)
 - [ ] Legal pages (privacy policy, terms), and a privacy note on the waitlist form
 - [ ] Standard shipping fee below US$75 (needed for `SHIPPING_FEE_USD`)
 - [ ] When orders open: Azul or CardNet merchant account, then finish *Payments* above
