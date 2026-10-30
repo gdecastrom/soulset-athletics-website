@@ -1,0 +1,95 @@
+# Soulset Athletics — website
+
+Pre-launch website for **Soulset Athletics**, sports nutrition for people who put their whole soul into it. *Mentality > Everything.*
+
+It's a static, dependency-free single-page site (HTML, CSS and vanilla JavaScript, hash-routed). There's no build step: open `index.html` or serve the folder from any static host.
+
+## Pre-launch mode: waitlist instead of checkout
+
+Orders aren't open yet, so there is no checkout or payment flow. Visitors can still browse the line-up, use the Fuel Planner and build a cart, which works as a wishlist. Every purchase path leads to the waitlist:
+
+- **Cart drawer** → "Join the waitlist" (`#waitlist`)
+- **Waitlist page** (`#waitlist`): email (required), first name (optional), country, plus the cart contents as "your picks"
+- **Confirmation** (`#waitlist-confirmed`)
+- **Home page sign-up** posts to the same waitlist
+- Old links to `#checkout` and `#order-confirmed` redirect to the waitlist
+
+### Connecting the waitlist (required before going live)
+
+Out of the box the site runs in **demo mode**: sign-ups are only kept in the visitor's browser and nothing is sent anywhere (a warning is logged to the console). To collect emails, set the endpoint near the top of `index.html`:
+
+```html
+<script>
+  window.SOULSET_CONFIG = { waitlistEndpoint: 'https://formspree.io/f/your-form-id' };
+</script>
+```
+
+The site sends a `POST` with a JSON body and treats any 2xx response as success. Any service that accepts JSON from the browser (with CORS) works. The quickest option is [Formspree](https://formspree.io): create a form, copy its endpoint URL, paste it above, and sign-ups arrive in your inbox and the Formspree dashboard, exportable as CSV.
+
+Payload sent for each sign-up:
+
+```json
+{
+  "email": "athlete@email.com",
+  "firstName": "Gabo",
+  "country": "DO",
+  "picks": [{ "id": "sodium", "name": "Sodium", "options": "1000 mg", "qty": 1, "subscribe": false }],
+  "picksSummary": "1 × Sodium (1000 mg)",
+  "source": "waitlist-page",
+  "language": "es-DO",
+  "submittedAt": "2026-10-30T13:50:14.279Z"
+}
+```
+
+`source` is `waitlist-page` or `home`. `picks` tells you which products people want most before launch. A hidden honeypot field filters out simple bots.
+
+## Run locally
+
+```bash
+python3 -m http.server 8000
+# then open http://localhost:8000
+```
+
+(Opening `index.html` directly from disk also works, though some browsers block local font loading that way.)
+
+## Deploy with GitHub Pages
+
+1. In the repository, go to **Settings → Pages**.
+2. Under **Build and deployment**, choose **Deploy from a branch**, branch `main`, folder `/ (root)`, and save.
+3. The site is published at `https://<your-username>.github.io/soulset-athletics-website/` after a minute or two. A custom domain (e.g. `soulsetathletics.com`) can be added on the same page.
+
+## Structure
+
+```
+index.html              Page shell, header, footer, cart drawer, waitlist config
+assets/css/site.css     Design tokens and all styles
+assets/js/app.js        Catalogue data, routing, cart, fuel planner, waitlist
+assets/fonts/           Saira Extra Condensed, Barlow, IBM Plex Mono (subset woff2)
+assets/img/             Product renders (webp)
+assets/favicon.svg      Double-chevron mark
+```
+
+Routes: `#home`, `#shop`, `#shop-fuel` / `-hydrate` / `-build` / `-ignite` / `-stacks`, `#p-<product-id>`, `#fuel-planner`, `#manifesto`, `#help`, `#waitlist`, `#waitlist-confirmed`.
+
+The product catalogue (names, options, prices, nutrition) lives in the `P` array at the top of `assets/js/app.js`.
+
+## Brand system
+
+- **Colours:** Soulset Black `#0A0A0A`, Bone `#F2F0EB`, Ignite `#FF5A1F` (actions and the ">" only; text on Ignite is always black)
+- **Type:** Saira Extra Condensed 800/900 (display, uppercase), Barlow 400–600 (body), IBM Plex Mono (nutrition data)
+- **Mark:** SA level-up mark, a squared S with stacked chevrons (Believe → Act → Results)
+
+## Before launch
+
+- [ ] Connect the waitlist endpoint (see above)
+- [ ] Real formulations and nutrition panels from the manufacturer
+- [ ] Final prices and currency (USD vs RD$)
+- [ ] Real product photography (current images are 3D renders)
+- [ ] Legal pages (privacy policy, terms), and a privacy note on the waitlist form
+- [ ] When orders open: payment processor (e.g. Azul, CardNet or Stripe) and a real checkout
+
+## Licences
+
+Fonts are licensed under the [SIL Open Font License 1.1](https://openfontlicense.org): Saira (Omnibus-Type), Barlow (Jeremy Tribby), IBM Plex Mono (IBM).
+
+Code, copy, product renders and the Soulset Athletics name and marks: © 2026 Soulset Athletics. All rights reserved.
