@@ -8,6 +8,10 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;'
 const money = n => 'US$' + (Math.round(n * 100) / 100).toFixed(2).replace(/\.00$/, '');
 const money2 = n => 'US$' + (Math.round(n * 100) / 100).toFixed(2);
 const tpl = id => document.getElementById(id).innerHTML;
+const MEDIA = n => `assets/media/${n}`;
+/* cinematic athlete footage: the poster shows first, the video streams in near the viewport (bindCine) */
+function cineMedia(clip, eager) { return `<div class="cine-media" aria-hidden="true"><img src="${MEDIA(clip)}.jpg" alt=""${eager ? ' fetchpriority="high"' : ' loading="lazy"'}><video muted loop playsinline preload="none" data-src="${MEDIA(clip)}.mp4"></video></div>`; }
+function cineStill(photo, eager) { return `<div class="cine-media" aria-hidden="true"><img src="${MEDIA(photo)}.webp" alt=""${eager ? ' fetchpriority="high"' : ' loading="lazy"'}></div>`; }
 const SUB_OFF = 0.15, FREE_SHIP = 75;
 
 /* ------------------------------------------------------------ catalogue */
@@ -214,15 +218,12 @@ function viewHome() {
   const cats = [['fuel', 'Fuel', 'Carb gels and carb + sodium mix', '01', 'gel-citrus'], ['hydrate', 'Hydrate', 'Sodium, dosed to your sweat', '02', 'na-1000'], ['build', 'Build', 'Creatine monohydrate', '03', 'cre-300'], ['ignite', 'Ignite', 'Pre-workout', '04', 'pre-mango']];
   const featured = ['carb-gel-30', 'fuel-mix-60', 'sodium', 'carb-gel-30-caffeine', 'pre-workout', 'creatine'];
   return `
-  <section class="hero"><div class="wrap hero-in">
-    <div class="hero-copy">
+  <section class="cine cine-bw cine-hero cine-flip" style="--pos:62% 50%">${cineStill('run-street', true)}<div class="wrap cine-in">
       <span class="eyebrow">Soulset Athletics · Sports nutrition</span>
       <h1 class="d-xxl">Mentality <span class="gt">&gt;</span> everything</h1>
       <p class="lead">Fuel, hydration and strength products for athletes who put their whole soul into it. Clear doses, no filler, built for heat and long hours.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Shop the fuel <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#manifesto">Read the manifesto</a></div>
       <div class="hero-facts"><span>Every dose printed on the front</span><span>Built for Caribbean heat</span><span>Subscribe &amp; save 15%</span></div>
-    </div>
-    <div class="hero-art"><div class="hero-chev">${tpl('t-chev')}</div><img class="hero-img" src="${IMG('hero')}" alt="Soulset Pre-Workout, Fuel Mix 60 and Creatine tubs with three Carb Gel 30 sachets" width="1500" height="1000"></div>
   </div></section>
   <div class="ticker" aria-hidden="true"><div class="ticker-track">${Array(2).fill('<span>Believe</span><span class="gt">›</span><span>Act</span><span class="gt">›</span><span>Results</span><span class="gt">›</span><span>Believe</span><span class="gt">›</span><span>Stay relentless</span><span class="gt">›</span><span>Mentality <i>&gt;</i> everything</span><span class="gt">›</span>').join('')}</div></div>
 
@@ -259,10 +260,10 @@ function viewHome() {
     </div>
   </section>
 
-  <section class="section-tight" style="border-top:1px solid var(--line)"><div class="wrap news">
+  <section class="cine cine-color" style="--pos:50% 35%">${cineMedia('sunset-silhouette')}<div class="wrap cine-in" style="--h:clamp(440px,64vh,640px)"><div class="news">
     <div style="display:grid;gap:12px"><span class="eyebrow">Join the waitlist</span><h2 class="d-l">Stay relentless</h2><p class="lead">Be first to know when Soulset launches, and get 10% off your first order.</p></div>
     <div><form id="newsForm" novalidate><label class="sr" for="newsEmail">Email address</label><input id="newsEmail" type="email" placeholder="you@email.com" autocomplete="email" required><button class="btn btn-primary" type="submit">Join the waitlist</button></form><p class="news-msg" id="newsMsg"></p></div>
-  </div></section>`;
+  </div></div></section>`;
 }
 function bindHome(root) {
   bindCardAdds(root); bindPlanner(root);
@@ -460,6 +461,10 @@ function viewManifesto() {
     </section>
   </div>
 
+  <section class="cine cine-center">${cineMedia('sweat-bw')}<div class="wrap cine-in" style="--h:clamp(460px,72vh,760px)">
+    <h2 class="d-xl" style="max-width:15ch">Early starts. Quiet miles. Work no one saw.</h2>
+  </div></section>
+
   <section class="band"><div class="wrap section" style="display:grid;gap:20px;justify-items:start">
     <span class="eyebrow">The rule</span>
     <h2 class="d-xxl">Mentality <span class="gt">&gt;</span> everything</h2>
@@ -488,13 +493,13 @@ function viewManifesto() {
       <div style="display:grid;gap:24px"><div style="display:grid;gap:12px"><span class="eyebrow">The mark</span><h2 class="d-l">Level up, three times</h2><p class="lead">Our S leans forward. Our A is built from three rising chevrons, one for each step of the loop. Together they read SA: Soulset Athletics.</p></div>
         <ol><li><span class="mono">01</span><div><b>Believe</b><p>The first chevron. Convince your mind.</p></div></li><li><span class="mono">02</span><div><b>Act</b><p>The second. Do the work, especially when you don't feel like it.</p></div></li><li><span class="mono">03</span><div><b>Results</b><p>The third. Earned, then used to believe again.</p></div></li></ol></div>
     </section>
+  </div>
 
-    <section class="section" style="padding-top:0;display:grid;gap:28px;justify-items:start;border-top:1px solid var(--line);padding-top:clamp(72px,9vw,128px)">
+  <section class="cine cine-color" style="--pos:50% 25%">${cineStill('run-track')}<div class="wrap cine-in">
       <h2 class="d-xxl">Stay relentless</h2>
       <p class="lead">Set yourself up for success with the best tools possible. Then put your whole soul into it.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Shop the fuel <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#fuel-planner">Build a fuel plan</a></div>
-    </section>
-  </div>`;
+  </div></section>`;
 }
 
 /* ------------------------------------------------------------ help */
@@ -604,6 +609,17 @@ function viewWaitlistDone() {
     </div></div>`;
 }
 
+/* ------------------------------------------------------------ cinematic footage */
+// Reduced motion and Save-Data keep the still poster; otherwise videos load near the viewport and pause off-screen.
+const quietMotion = matchMedia('(prefers-reduced-motion: reduce)').matches || !!(navigator.connection && navigator.connection.saveData);
+const cineObs = 'IntersectionObserver' in window && !quietMotion ? new IntersectionObserver(es => es.forEach(e => {
+  const v = e.target;
+  if (!e.isIntersecting) return v.pause();
+  if (!v.src) { v.muted = true; v.src = v.dataset.src; v.addEventListener('playing', () => v.classList.add('on'), { once: true }); }
+  v.play().catch(() => {});
+}), { rootMargin: '200px 0px' }) : null;
+function bindCine(root) { if (!cineObs) return; cineObs.disconnect(); $$('.cine-media video', root).forEach(v => cineObs.observe(v)); }
+
 /* ------------------------------------------------------------ router */
 const view = $('#view');
 function setTitle(t) { document.title = t ? `${t} · Soulset Athletics` : 'Soulset Athletics'; }
@@ -619,7 +635,7 @@ function render() {
   else if (h === 'waitlist' || h === 'checkout') { html = viewWaitlist(); bind = bindWaitlist; title = 'Join the waitlist'; nav = 'waitlist'; }
   else if (h === 'waitlist-confirmed' || h === 'order-confirmed') { const done = !!store.get('waitlist', null); html = viewWaitlistDone(); bind = done ? () => {} : bindWaitlist; title = done ? 'You’re on the list' : 'Join the waitlist'; nav = 'waitlist'; }
   else { html = `<div class="wrap conf"><h1 class="d-xl">Page not found</h1><p class="lead">That page doesn't exist. Your next session does.</p><div><a class="btn btn-primary btn-l" href="#shop">Shop all</a></div></div>`; title = 'Not found'; }
-  view.innerHTML = html; bind(view); setTitle(title);
+  view.innerHTML = html; bind(view); bindCine(view); setTitle(title);
   $$('.nav a').forEach(a => a.toggleAttribute('aria-current', false));
   $$('.nav a').forEach(a => { if (a.dataset.nav === nav) a.setAttribute('aria-current', 'page'); });
   $('#shopBtn').classList.toggle('is-current', nav.startsWith('shop'));

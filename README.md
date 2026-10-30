@@ -81,6 +81,27 @@ Routes: `#home`, `#shop`, `#shop-fuel` / `-hydrate` / `-build` / `-ignite` / `-s
 
 The product catalogue (names, options, prices, nutrition) lives in the `P` array at the top of `assets/js/app.js`.
 
+## Cinematic footage
+
+Full-bleed athlete imagery sits behind four sections:
+
+- **Home hero:** still photo, black-and-white grade (`.cine-bw`), mirrored so the runner is on the right (`.cine-flip`)
+- **Home waitlist sign-up:** looping clip in full colour (`.cine-color`)
+- **Manifesto mid-page line:** looping clip
+- **Manifesto closer:** still photo in full colour
+
+Everything lives in `assets/media/`. A clip is a pair, `<name>.mp4` plus a `<name>.jpg` poster, used as `cineMedia('<name>')`. A still is `<name>.webp`, used as `cineStill('<name>')`. Both helpers are in `app.js` / `app.es.js`. The grade is applied in CSS, so footage can be shot in colour.
+
+- A clip's poster shows first. The video loads only when its section nears the viewport and pauses when it scrolls away.
+- Visitors with reduced motion or Data Saver turned on only see the poster.
+- To swap in your own shoot, replace the files and keep the names, or add new ones and change the name in both scripts. Aim for 720p, 6–15 s seamless loops, muted, under ~5 MB each, and stills about 2400 px wide.
+- **No visible brands:** clothing, shoes and gear in any image must show no logos.
+
+The current media are placeholders:
+
+- Clips from [Mixkit](https://mixkit.co/license/#videoFree), free for commercial use with no attribution required: sweat-bw 50964, sunset-silhouette 608.
+- Stills from [Unsplash](https://unsplash.com/license), free for commercial use: run-street (photo-1759834857374) and run-track (photo-1766970096346).
+
 ## Brand system
 
 - **Colours:** Soulset Black `#0A0A0A`, Bone `#F2F0EB`, Ignite `#FF5A1F` (actions and the ">" only; text on Ignite is always black)
@@ -93,6 +114,7 @@ The product catalogue (names, options, prices, nutrition) lives in the `P` array
 - [ ] Real formulations and nutrition panels from the manufacturer
 - [ ] Final prices and currency (USD vs RD$)
 - [ ] Real product photography (current images are 3D renders)
+- [ ] Own athlete footage to replace the Mixkit placeholders in `assets/media/`, ideally with Soulset product in shot
 - [ ] Legal pages (privacy policy, terms), and a privacy note on the waitlist form
 - [ ] When orders open: payment processor (e.g. Azul, CardNet or Stripe) and a real checkout
 
