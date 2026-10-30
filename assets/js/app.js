@@ -218,7 +218,7 @@ function viewHome() {
   const cats = [['fuel', 'Fuel', 'Carb gels and carb + sodium mix', '01', 'gel-citrus'], ['hydrate', 'Hydrate', 'Sodium, dosed to your sweat', '02', 'na-1000'], ['build', 'Build', 'Creatine monohydrate', '03', 'cre-300'], ['ignite', 'Ignite', 'Pre-workout', '04', 'pre-mango']];
   const featured = ['carb-gel-30', 'fuel-mix-60', 'sodium', 'carb-gel-30-caffeine', 'pre-workout', 'creatine'];
   return `
-  <section class="cine cine-bw cine-hero cine-flip" style="--pos:62% 50%">${cineStill('run-street', true)}<div class="wrap cine-in">
+  <section class="cine cine-color cine-hero" style="--pos:50% 25%">${cineStill('run-track', true)}<div class="wrap cine-in">
       <span class="eyebrow">Soulset Athletics · Sports nutrition</span>
       <h1 class="d-xxl">Mentality <span class="gt">&gt;</span> everything</h1>
       <p class="lead">Fuel, hydration and strength products for athletes who put their whole soul into it. Clear doses, no filler, built for heat and long hours.</p>
@@ -260,7 +260,7 @@ function viewHome() {
     </div>
   </section>
 
-  <section class="cine cine-color" style="--pos:50% 35%">${cineMedia('sunset-silhouette')}<div class="wrap cine-in" style="--h:clamp(440px,64vh,640px)"><div class="news">
+  <section class="cine cine-color" style="--pos:60% 50%">${cineMedia('train-ropes')}<div class="wrap cine-in" style="--h:clamp(440px,64vh,640px)"><div class="news">
     <div style="display:grid;gap:12px"><span class="eyebrow">Join the waitlist</span><h2 class="d-l">Stay relentless</h2><p class="lead">Be first to know when Soulset launches, and get 10% off your first order.</p></div>
     <div><form id="newsForm" novalidate><label class="sr" for="newsEmail">Email address</label><input id="newsEmail" type="email" placeholder="you@email.com" autocomplete="email" required><button class="btn btn-primary" type="submit">Join the waitlist</button></form><p class="news-msg" id="newsMsg"></p></div>
   </div></div></section>`;
@@ -495,7 +495,7 @@ function viewManifesto() {
     </section>
   </div>
 
-  <section class="cine cine-color" style="--pos:50% 25%">${cineStill('run-track')}<div class="wrap cine-in">
+  <section class="cine cine-bw cine-flip" style="--pos:62% 50%">${cineStill('run-street')}<div class="wrap cine-in">
       <h2 class="d-xxl">Stay relentless</h2>
       <p class="lead">Set yourself up for success with the best tools possible. Then put your whole soul into it.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Shop the fuel <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#fuel-planner">Build a fuel plan</a></div>

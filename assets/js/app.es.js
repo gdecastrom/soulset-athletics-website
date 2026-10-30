@@ -221,7 +221,7 @@ function viewHome() {
   const cats = [['fuel', 'Energía', 'Geles de carbohidratos y mezcla de carbos + sodio', '01', 'gel-citrus'], ['hydrate', 'Hidratación', 'Sodio, dosificado según tu sudor', '02', 'na-1000'], ['build', 'Fuerza', 'Creatina monohidratada', '03', 'cre-300'], ['ignite', 'Activación', 'Pre-entreno', '04', 'pre-mango']];
   const featured = ['carb-gel-30', 'fuel-mix-60', 'sodium', 'carb-gel-30-caffeine', 'pre-workout', 'creatine'];
   return `
-  <section class="cine cine-bw cine-hero cine-flip" style="--pos:62% 50%">${cineStill('run-street', true)}<div class="wrap cine-in">
+  <section class="cine cine-color cine-hero" style="--pos:50% 25%">${cineStill('run-track', true)}<div class="wrap cine-in">
       <span class="eyebrow">Soulset Athletics · Nutrición deportiva</span>
       <h1 class="d-xxl">Mentalidad&nbsp;<span class="gt">&gt;</span> todo</h1>
       <p class="lead">Energía, hidratación y fuerza para atletas que le ponen toda el alma. Dosis claras, sin relleno, hechos para el calor y las horas largas.</p>
@@ -263,7 +263,7 @@ function viewHome() {
     </div>
   </section>
 
-  <section class="cine cine-color" style="--pos:50% 35%">${cineMedia('sunset-silhouette')}<div class="wrap cine-in" style="--h:clamp(440px,64vh,640px)"><div class="news">
+  <section class="cine cine-color" style="--pos:60% 50%">${cineMedia('train-ropes')}<div class="wrap cine-in" style="--h:clamp(440px,64vh,640px)"><div class="news">
     <div style="display:grid;gap:12px"><span class="eyebrow">Únete a la lista de espera</span><h2 class="d-l">Sin descanso</h2><p class="lead">Entérate primero cuando Soulset se lance y recibe 10% de descuento en tu primer pedido.</p></div>
     <div><form id="newsForm" novalidate><label class="sr" for="newsEmail">Correo electrónico</label><input id="newsEmail" type="email" placeholder="tu@correo.com" autocomplete="email" required><button class="btn btn-primary" type="submit">Únete a la lista</button></form><p class="news-msg" id="newsMsg"></p></div>
   </div></div></section>`;
@@ -498,7 +498,7 @@ function viewManifesto() {
     </section>
   </div>
 
-  <section class="cine cine-color" style="--pos:50% 25%">${cineStill('run-track')}<div class="wrap cine-in">
+  <section class="cine cine-bw cine-flip" style="--pos:62% 50%">${cineStill('run-street')}<div class="wrap cine-in">
       <h2 class="d-xxl">Sin descanso</h2>
       <p class="lead">Prepárate para el éxito con las mejores herramientas posibles. Después, ponle toda el alma.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Ver los productos <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#fuel-planner">Arma tu plan</a></div>

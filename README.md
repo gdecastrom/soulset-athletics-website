@@ -85,10 +85,10 @@ The product catalogue (names, options, prices, nutrition) lives in the `P` array
 
 Full-bleed athlete imagery sits behind four sections:
 
-- **Home hero:** still photo, black-and-white grade (`.cine-bw`), mirrored so the runner is on the right (`.cine-flip`)
+- **Home hero:** still photo in full colour (`.cine-color`)
 - **Home waitlist sign-up:** looping clip in full colour (`.cine-color`)
 - **Manifesto mid-page line:** looping clip
-- **Manifesto closer:** still photo in full colour
+- **Manifesto closer:** still photo, black-and-white grade (`.cine-bw`), mirrored so the runner is on the right (`.cine-flip`)
 
 Everything lives in `assets/media/`. A clip is a pair, `<name>.mp4` plus a `<name>.jpg` poster, used as `cineMedia('<name>')`. A still is `<name>.webp`, used as `cineStill('<name>')`. Both helpers are in `app.js` / `app.es.js`. The grade is applied in CSS, so footage can be shot in colour.
 
@@ -99,7 +99,7 @@ Everything lives in `assets/media/`. A clip is a pair, `<name>.mp4` plus a `<nam
 
 The current media are placeholders:
 
-- Clips from [Mixkit](https://mixkit.co/license/#videoFree), free for commercial use with no attribution required: sweat-bw 50964, sunset-silhouette 608.
+- Clips from [Mixkit](https://mixkit.co/license/#videoFree), free for commercial use with no attribution required: sweat-bw 50964, train-ropes 52088.
 - Stills from [Unsplash](https://unsplash.com/license), free for commercial use: run-street (photo-1759834857374) and run-track (photo-1766970096346).
 
 ## Brand system
