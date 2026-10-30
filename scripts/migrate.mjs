@@ -1,4 +1,4 @@
-/* Creates or updates the waitlist tables. Usage: DATABASE_URL=postgres://… npm run db:migrate */
+/* Creates or updates the tables, views and triggers in db/schema.sql. Run it with the database owner login. Usage: DATABASE_URL=postgres://… npm run db:migrate */
 import { readFile } from 'node:fs/promises';
 import postgres from 'postgres';
 

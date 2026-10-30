@@ -1,7 +1,0 @@
-# Not part of the public site. api/ and lib/ are bundled into the functions.
-.claude
-.env*
-db
-scripts
-test
-README.md
