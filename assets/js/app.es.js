@@ -600,7 +600,7 @@ function viewWaitlistDone() {
   if (!w) return viewWaitlist();
   return `<div class="wrap conf">
     <div style="display:grid;gap:16px"><span class="eyebrow">Lista de espera · confirmado</span><h1 class="d-xxl">Ya estás en la lista${w.firstName ? ', ' + esc(w.firstName) : ''}</h1>
-      <p class="lead">Le escribiremos a <b style="color:var(--bone)">${esc(w.email)}</b> el día que Soulset se lance, con 10% de descuento en tu primer pedido. Mientras tanto: deja de desear, empieza a hacer.</p></div>
+      <p class="lead">Te escribiremos a <b style="color:var(--bone)">${esc(w.email)}</b> el día que Soulset se lance, con 10% de descuento en tu primer pedido. Mientras tanto: deja de desear, empieza a hacer.</p></div>
     <div class="conf-grid">
       <div class="conf-box">${picksHTML()}</div>
       <div class="conf-box" style="background:var(--raised)"><h3>Mientras esperas</h3><p>Calcula tus carbohidratos, sodio y líquido por hora, o lee lo que defendemos.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-primary" href="#fuel-planner">Planificador</a><a class="btn btn-secondary" href="#manifesto">Lee el manifiesto</a></div></div>

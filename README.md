@@ -46,7 +46,7 @@ Payload sent for each sign-up:
 
 A Spanish version lives at `/es/` (`es/index.html` + `assets/js/app.es.js`), with an EN/ES switch in the header that keeps the current page. Routes (`#shop`, `#p-<id>`, …) are the same in both.
 
-`app.es.js` is a translated copy of `app.js`: same logic, Spanish copy and catalogue text. **When you change behaviour or prices in one, make the same change in the other.** Each language keeps its own cart and waitlist state in the browser (storage keys `ss_` and `ss_es_`), because cart lines store option names in their own language.
+`app.es.js` is a translated copy of `app.js`: same logic, Spanish copy and catalogue text. **When you change behaviour or prices in one, make the same change in the other.** Spanish copy always addresses the visitor as *tú* (te, tu, tus; imperatives like "Únete", "Elige"), never *usted*. Each language keeps its own cart and waitlist state in the browser (storage keys `ss_` and `ss_es_`), because cart lines store option names in their own language.
 
 ## Run locally
 
