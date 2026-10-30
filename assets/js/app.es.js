@@ -18,7 +18,7 @@ const CATS = {
   hydrate: { name: 'Hidratación', line: 'Sodio que dosificas según tu sudor, sin azúcar.' },
   build: { name: 'Fuerza', line: 'Creatina monohidratada. Un solo ingrediente, todos los días.' },
   ignite: { name: 'Activación', line: 'Pre-entreno para enfoque, resistencia y bombeo.' },
-  stacks: { name: 'Combos', line: 'Los productos correctos juntos, por menos.' },
+  stacks: { name: 'Combos', line: 'Productos que funcionan juntos, a mejor precio.' },
 };
 const GEL_USE = ['Toma 1 gel cada 20–30 minutos en sesiones de más de 60 minutos.', 'Apunta a 60–90 g de carbohidratos por hora: eso son 2–3 geles.', 'Tómalo con unos sorbos de agua. Practica tu alimentación en los entrenamientos antes del día de la carrera.'];
 const GEL_ING = 'Agua, maltodextrina, fructosa, citrato de sodio, cloruro de sodio, saborizante natural, ácido cítrico, conservante (sorbato de potasio).';
@@ -34,7 +34,7 @@ const P = [
     use: GEL_USE, ingredients: GEL_ING, pairs: ['carb-gel-30-caffeine', 'sodium'], sub: true },
   { id: 'carb-gel-30-caffeine', code: 'GEL-030C', cat: 'fuel', name: 'Carb Gel 30 Caffeine', tag: 'Sube de nivel', level: 1,
     short: '30 g carbohidratos · 200 mg sodio · 50 o 100 mg cafeína',
-    blurb: 'Los mismos 30 g de carbohidratos y 200 mg de sodio, con cafeína para las horas en que tu cabeza lo necesita más que tus piernas. Elige Nivel 1 (50 mg) o Nivel 2 (100 mg). Los chevrones del empaque te dicen cuál es cuál.',
+    blurb: 'Los mismos 30 g de carbohidratos y 200 mg de sodio, más cafeína para las últimas horas de una sesión larga. Elige Nivel 1 (50 mg) o Nivel 2 (100 mg); los chevrones del empaque indican cuál es cuál.',
     stats: [['30', 'g carbohidratos'], ['200', 'mg sodio'], ['50–100', 'mg cafeína']],
     options: [{ key: 'caffeine', label: 'Cafeína', values: [{ v: 'Nivel 1 · 50 mg · Cítrico', img: 'gel-caf50', level: 1 }, { v: 'Nivel 2 · 100 mg · Cola', img: 'gel-caf100', level: 2 }] },
               { key: 'pack', label: 'Presentación', values: [{ v: 'Caja de 12', price: 34 }, { v: 'Caja de 24', price: 64, note: 'Ahorra 6%' }] }],
@@ -72,7 +72,7 @@ const P = [
     ingredients: 'Creatina monohidratada.', pairs: ['pre-workout', 'strength-stack'], sub: true },
   { id: 'pre-workout', code: 'PRE-200', cat: 'ignite', name: 'Pre-Workout', tag: 'Nivel 2', level: 2,
     short: '200 mg cafeína · 3.2 g beta-alanina · 6 g citrulina',
-    blurb: 'Enciéndete antes de empezar. 200 mg de cafeína para el enfoque, 3.2 g de beta-alanina para aguantar los esfuerzos duros y 6 g de L-citrulina malato para el flujo sanguíneo y el bombeo. Etiqueta limpia, cada dosis impresa.',
+    blurb: '200 mg de cafeína para el enfoque, 3.2 g de beta-alanina para aguantar los esfuerzos duros y 6 g de L-citrulina malato para el flujo sanguíneo y el bombeo. Cada dosis está impresa en la etiqueta.',
     stats: [['200', 'mg cafeína'], ['3.2', 'g beta-alanina'], ['6', 'g citrulina']],
     options: [{ key: 'flavour', label: 'Sabor', values: [{ v: 'Manzana ácida', img: 'pre-sour-apple' }, { v: 'Naranja sanguina', img: 'pre-blood-orange' }, { v: 'Mango', img: 'pre-mango' }] }],
     basePrice: 45, gallery: ['pre-side', 'pre-top'],
@@ -89,7 +89,7 @@ const P = [
     use: ['La noche antes: prepara tus botellas de Fuel Mix 60.', 'Carrera: 1 botella por hora más 1 gel cada 30–40 minutos.', 'Día caluroso: añade una botella de Sodium 1000 en la primera hora.'], pairs: ['carb-gel-30-caffeine', 'sodium'], sub: false },
   { id: 'strength-stack', code: 'STK-STR', cat: 'stacks', name: 'Strength Stack', tag: 'Ahorra US$9', level: 2,
     short: 'Pre-Workout · Creatine 300 g',
-    blurb: 'Pre-Workout (Naranja sanguina) y Creatine Monohydrate 300 g. Uno te enciende para hoy; el otro construye para los meses que vienen.',
+    blurb: 'Pre-Workout (Naranja sanguina) y Creatine Monohydrate 300 g. El pre-entreno antes de entrenar y la creatina todos los días.',
     stats: [['200', 'mg cafeína'], ['5', 'g creatina'], ['30', 'sesiones']],
     options: [], basePrice: 68, compare: 77, gallery: [], main: 'stack-strength',
     contents: ['Pre-Workout · Naranja sanguina · 30 porciones', 'Creatine Monohydrate · 300 g · 60 porciones'],
@@ -162,7 +162,7 @@ function renderCart() {
   const sub = subtotal();
   $('#shipBar').innerHTML = `<span><b>Prelanzamiento.</b> Todavía no aceptamos pedidos. Guarda tus favoritos y únete a la lista de espera para tener acceso primero.</span>`;
   if (!cart.length) {
-    $('#drawerItems').innerHTML = `<div class="empty"><span class="d-m">Aquí no hay nada todavía.</span><p>Deja de desear. Empieza a hacer. Elige tu energía.</p><a class="btn btn-primary" href="#shop" data-close>Ver todo</a></div>`;
+    $('#drawerItems').innerHTML = `<div class="empty"><span class="d-m">Aquí no hay nada todavía.</span><p>Añade productos y te los guardamos junto con tu lugar en la lista.</p><a class="btn btn-primary" href="#shop" data-close>Ver todo</a></div>`;
     $('#drawerFoot').innerHTML = '';
   } else {
     $('#drawerItems').innerHTML = cart.map((l, i) => { const p = byId[l.id]; return `
@@ -221,7 +221,7 @@ function viewHome() {
     <div class="hero-copy">
       <span class="eyebrow">Soulset Athletics · Nutrición deportiva</span>
       <h1 class="d-xxl">Mentalidad&nbsp;<span class="gt">&gt;</span> todo</h1>
-      <p class="lead">Energía, hidratación y fuerza para atletas que le ponen toda el alma. Dosis claras, sin relleno, hechos para el calor y las horas largas.</p>
+      <p class="lead">Geles de carbohidratos, bebida, electrolitos, creatina y pre-entreno para sesiones largas con calor.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Ver los productos <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#manifesto">Lee el manifiesto</a></div>
       <div class="hero-facts"><span>Cada dosis impresa al frente</span><span>Diseñado para el calor caribeño</span><span>Suscríbete y ahorra 15%</span></div>
     </div>
@@ -235,14 +235,14 @@ function viewHome() {
   </section>
 
   <section class="section-tight wrap" style="padding-top:0">
-    <div class="sec-head"><div><span class="eyebrow">La línea</span><h2 class="d-l">Tu pasión, nuestro combustible</h2></div><a class="btn-ghost btn" href="#shop">Ver los 8 <span class="edge">›</span></a></div>
+    <div class="sec-head"><div><span class="eyebrow">La línea</span><h2 class="d-l">Empieza por aquí</h2></div><a class="btn-ghost btn" href="#shop">Ver los ${P.length} <span class="edge">›</span></a></div>
     <div class="grid" id="homeGrid">${featured.map(id => card(byId[id])).join('')}</div>
   </section>
 
   <section class="band"><div class="wrap section" style="display:grid;gap:28px">
     <span class="eyebrow">Nuestro manifiesto</span>
     <h2 class="d-xl" style="max-width:14ch">Ponle toda el alma</h2>
-    <p class="lead" style="color:#3A3936;max-width:60ch">Tu mente es lo primero que tienes que convencer. Soulset es un recordatorio constante de dejar de desear y empezar a hacer: cree en tu potencial, actúa, gánate los resultados y vuelve a creer.</p>
+    <p class="lead" style="color:#3A3936;max-width:60ch">Tu mente es lo primero que tienes que convencer. Cree en tu potencial, actúa, gánate los resultados y vuelve a empezar.</p>
     <div><a class="btn btn-primary btn-l" href="#manifesto" style="background:var(--void);color:var(--bone)">Lee el manifiesto <span class="edge">›</span></a></div>
   </div></section>
 
@@ -257,13 +257,13 @@ function viewHome() {
       <div><span class="mono">01 · DURANTE</span><span class="d-s">Carb Gel 30</span><p>30 g de carbohidratos y 200 mg de sodio por gel. 2–3 por hora.</p></div>
       <div><span class="mono">02 · EN LA BOTELLA</span><span class="d-s">Fuel Mix 60</span><p>60 g de carbohidratos y 500 mg de sodio por botella.</p></div>
       <div><span class="mono">03 · CON CALOR</span><span class="d-s">Sodium</span><p>500, 1000 o 1500 mg. Cero azúcar.</p></div>
-      <div><span class="mono">04 · CADA DÍA</span><span class="d-s">Creatine</span><p>5 g. Un ingrediente. La constancia gana.</p></div>
-      <div><span class="mono">05 · ANTES</span><span class="d-s">Pre-Workout</span><p>Cafeína, beta-alanina, citrulina. Enciéndete.</p></div>
+      <div><span class="mono">04 · CADA DÍA</span><span class="d-s">Creatine</span><p>5 g al día. Un ingrediente.</p></div>
+      <div><span class="mono">05 · ANTES</span><span class="d-s">Pre-Workout</span><p>Cafeína, beta-alanina y citrulina, 20–30 minutos antes.</p></div>
     </div>
   </section>
 
-  <section class="section-tight" style="border-top:1px solid var(--line)"><div class="wrap news">
-    <div style="display:grid;gap:12px"><span class="eyebrow">Únete a la lista de espera</span><h2 class="d-l">Sin descanso</h2><p class="lead">Entérate primero cuando Soulset se lance y recibe 10% de descuento en tu primer pedido.</p></div>
+  <section class="section-tight"><div class="wrap news">
+    <div style="display:grid;gap:12px"><span class="eyebrow">Únete a la lista de espera</span><h2 class="d-l">Llévate 10% en el lanzamiento</h2><p class="lead">Únete a la lista de espera y te escribimos cuando abran los pedidos, con 10% de descuento en tu primer pedido.</p></div>
     <div><form id="newsForm" novalidate><label class="sr" for="newsEmail">Correo electrónico</label><input id="newsEmail" type="email" placeholder="tu@correo.com" autocomplete="email" required><button class="btn btn-primary" type="submit">Únete a la lista</button></form><p class="news-msg" id="newsMsg"></p></div>
   </div></section>`;
 }
@@ -274,7 +274,7 @@ function bindHome(root) {
     if (!EMAIL_RE.test(v)) { m.style.color = 'var(--danger)'; m.textContent = 'Escribe un correo válido, como tu@correo.com.'; return; }
     btn.disabled = true; m.style.color = 'var(--muted)'; m.textContent = 'Guardando tu lugar…';
     try { await joinWaitlist({ email: v, source: 'home' }); m.style.color = 'var(--success)'; m.textContent = `Ya estás en la lista. Te escribiremos en el lanzamiento con 10% de descuento en tu primer pedido.`; form.reset(); }
-    catch (err) { m.style.color = 'var(--danger)'; m.textContent = `No pudimos guardar tu lugar. Revisa tu conexión e inténtalo de nuevo.`; }
+    catch (err) { m.style.color = 'var(--danger)'; m.textContent = saveError(err); }
     finally { btn.disabled = false; }
   });
 }
@@ -328,7 +328,7 @@ function viewProduct(p) {
           <div class="buy-row"><div class="qty"><button type="button" data-pq="-1" aria-label="Reducir cantidad">−</button><input type="number" id="pdpQty" min="1" max="99" value="1" aria-label="Cantidad"><button type="button" data-pq="1" aria-label="Aumentar cantidad">+</button></div>
             <button class="btn btn-primary btn-l" type="submit" id="addBtn">Añadir al carrito</button></div>
         </form>
-        <div class="assure"><div><b>Envío gratis</b>En pedidos de más de US$75</div><div><b>Cada dosis impresa</b>Al frente de cada empaque</div><div><b>Garantía de 30 días</b>¿Sin abrir y no te convence? Devuélvelo</div></div>
+        <div class="assure"><div><b>Envío gratis</b>En pedidos de más de US$75</div><div><b>Cada dosis impresa</b>Al frente de cada empaque</div><div><b>Devoluciones en 30 días</b>En productos sin abrir</div></div>
         <div class="acc">
           ${p.nutrition ? `<details open><summary>Qué contiene</summary><div class="acc-body">${nutritionHTML(p.nutrition)}</div></details>` : ''}
           <details ${p.nutrition ? '' : 'open'}><summary>Modo de uso</summary><div class="acc-body"><ul style="margin:0;padding-left:18px;display:grid;gap:6px">${p.use.map(u => `<li>${esc(u)}</li>`).join('')}</ul></div></details>
@@ -337,7 +337,7 @@ function viewProduct(p) {
         </div>
       </div>
     </div>
-    <section class="section-tight" style="border-top:1px solid var(--line)"><div class="sec-head"><div><span class="eyebrow">Combina bien con</span><h2 class="d-m">Completa el stack</h2></div></div>
+    <section class="section-tight"><div class="sec-head"><div><span class="eyebrow">Combina bien con</span><h2 class="d-m">Completa el stack</h2></div></div>
       <div class="grid">${[...p.pairs, P.find(x => x.id !== p.id && !p.pairs.includes(x.id) && x.cat !== p.cat).id].slice(0, 3).map(id => card(byId[id])).join('')}</div></section>
   </div>`, bind(root) {
     const upd = () => {
@@ -423,7 +423,7 @@ function bindPlanner(root) {
   f.addEventListener('input', run); f.addEventListener('change', run); run();
 }
 function viewPlanner() {
-  return `<div class="wrap"><div class="shop-top"><span class="eyebrow">Planificador</span><h1 class="d-xl">Prepárate para el éxito</h1><p class="lead">Las mejores herramientas solo funcionan con un plan. Indica tu sesión y calculamos carbohidratos, sodio y líquido por hora, y te armamos la canasta.</p></div>
+  return `<div class="wrap"><div class="shop-top"><span class="eyebrow">Planificador</span><h1 class="d-xl">Planifica tu energía</h1><p class="lead">Indica tu sesión y calculamos carbohidratos, sodio y líquido por hora, y te armamos la canasta.</p></div>
     <div class="section-tight">${plannerHTML()}</div>
     <div class="section-tight" style="padding-top:0;display:grid;gap:20px;max-width:70ch;color:var(--muted)">
       <h2 class="d-m" style="color:var(--bone)">Cómo salen los números</h2>
@@ -439,9 +439,9 @@ function viewManifesto() {
     ['La mentalidad ante todo', 'Primero va la cabeza y el cuerpo la sigue. Sin la mentalidad ganadora correcta, los retos entre tú y tus aspiraciones se quedan donde están.'],
     ['Invierte en ti', 'Tus metas y ambiciones merecen inversión real: tiempo, esfuerzo, dinero, sueño, disciplina. Tú eres el proyecto.'],
     ['Prepárate para ganar', 'Usa las mejores herramientas disponibles. Nuestra nutrición es una de ellas. Un plan le gana a la esperanza siempre.'],
-    ['Empoderamiento, pasión, mentalidad ganadora', 'Le hablamos a gente que espera ganar, y que actúa así mucho antes de que llegue el resultado.'],
+    ['Empoderamiento, pasión, mentalidad ganadora', 'Para gente que espera ganar y entrena así.'],
     ['Toda el alma', 'El medio esfuerzo no es opción. Hagas lo que hagas, ponle todo de ti.'],
-    ['Sin descanso', 'Sigue cuando deja de ser divertido. Ahí es donde de verdad empieza el trabajo.'],
+    ['Sin descanso', 'Sigue cuando deja de ser divertido.'],
   ];
   return `<div class="wrap">
     <section class="mf-hero">
@@ -449,7 +449,7 @@ function viewManifesto() {
       <div class="def"><div class="def-word">Soul<br>set</div>
         <div class="def-body"><span class="pos">soul·set /ˈsōlˌset/ · sustantivo</span>
           <p style="font-size:22px;color:var(--bone)">La actitud empoderada de ponerle toda el alma a algo.</p>
-          <blockquote>"Su soulset apareció mucho antes del día de la carrera. Vivía en las madrugadas, en los kilómetros en silencio y en el trabajo que nadie vio."</blockquote>
+          <blockquote>“Fue su soulset lo que la sacó adelante en los últimos 10 km.”</blockquote>
           <p style="color:var(--muted)">El nombre son dos palabras en inglés fundidas en una: <b style="color:var(--bone)">soul</b> (alma) y <b style="color:var(--bone)">mindset</b> (mentalidad). Significa ponerle toda el alma a lo que estés haciendo.</p></div></div>
     </section>
 
@@ -457,8 +457,8 @@ function viewManifesto() {
       <h2 class="d-xl">Ponle toda el alma</h2>
       <div class="copy">
         <p>Soulset existe para impulsar una creencia: la mentalidad es el factor más grande para alcanzar cualquier meta. El talento, la genética y el equipo importan. Pero van en segundo lugar.</p>
-        <p>La actitud empoderada de ponerle toda el alma a algo te da una sensación de control en las situaciones difíciles. Cuando la sesión duele, cuando la carrera sale mal, cuando la vida se pone ruidosa, la decisión de seguir sigue siendo tuya.</p>
-        <p>Sin la mentalidad ganadora correcta, no es posible superar los retos que hay entre nosotros y nuestras aspiraciones. <b style="color:var(--bone)">Tu mente es lo primero que tienes que convencer.</b></p>
+        <p>Ponerle toda el alma a algo te da control en los momentos difíciles. Cuando la sesión duele o la carrera sale mal, la decisión de seguir sigue siendo tuya.</p>
+        <p><b style="color:var(--bone)">Tu mente es lo primero que tienes que convencer.</b></p>
       </div>
     </section>
   </div>
@@ -466,18 +466,18 @@ function viewManifesto() {
   <section class="band"><div class="wrap section" style="display:grid;gap:20px;justify-items:start">
     <span class="eyebrow">La regla</span>
     <h2 class="d-xxl">Mentalidad&nbsp;<span class="gt">&gt;</span> todo</h2>
-    <p class="lead" style="color:#3A3936">Todo lo que hacemos, escribimos e imprimimos es un recordatorio de eso, desde el frente de un gel hasta la tapa de un pote.</p>
+    <p class="lead" style="color:#3A3936">Va al frente de cada gel y en la tapa de cada pote.</p>
   </div></section>
 
   <div class="wrap">
     <section class="section" style="display:grid;gap:32px">
-      <div class="sec-head" style="margin:0"><div><span class="eyebrow">El ciclo Soulset</span><h2 class="d-l">Deja de desear. Empieza a hacer.</h2><p class="lead">Queremos que esta marca sea un recordatorio constante de actuar. Los resultados no llegan por quererlos. Llegan de un ciclo que repites hasta que se convierte en quien eres.</p></div></div>
+      <div class="sec-head" style="margin:0"><div><span class="eyebrow">El ciclo Soulset</span><h2 class="d-l">Deja de desear. Empieza a hacer.</h2><p class="lead">Los resultados salen de un ciclo que repites: cree, actúa, gánate los resultados y vuelve a creer.</p></div></div>
       <div class="loop">
         <div><span class="mono">01</span><span class="d-s">Cree en tu potencial</span><p>Ve lo que puedes llegar a ser antes que nadie.</p></div>
-        <div><span class="mono">02</span><span class="d-s">Actúa</span><p>Deja de desear. Empieza a hacer. Hoy, no el lunes.</p></div>
-        <div><span class="mono">03</span><span class="d-s">Resultados</span><p>Pruebas, ganadas una sesión a la vez.</p></div>
+        <div><span class="mono">02</span><span class="d-s">Actúa</span><p>Hoy, no el lunes.</p></div>
+        <div><span class="mono">03</span><span class="d-s">Resultados</span><p>Ganados una sesión a la vez.</p></div>
         <div><span class="mono">04</span><span class="d-s">Cree</span><p>Los resultados alimentan la fe. La fe arranca la siguiente vuelta.</p></div>
-        <div><span class="mono">05</span><span class="d-s">Éxito</span><p>No es una meta final. Es el ciclo, repetido hasta que es quien eres.</p></div>
+        <div><span class="mono">05</span><span class="d-s">Éxito</span><p>El ciclo, repetido hasta que se vuelve hábito.</p></div>
       </div>
     </section>
 
@@ -492,9 +492,9 @@ function viewManifesto() {
         <ol><li><span class="mono">01</span><div><b>Cree</b><p>El primer chevrón. Convence a tu mente.</p></div></li><li><span class="mono">02</span><div><b>Actúa</b><p>El segundo. Haz el trabajo, sobre todo cuando no tienes ganas.</p></div></li><li><span class="mono">03</span><div><b>Resultados</b><p>El tercero. Ganados, y usados para volver a creer.</p></div></li></ol></div>
     </section>
 
-    <section class="section" style="padding-top:0;display:grid;gap:28px;justify-items:start;border-top:1px solid var(--line);padding-top:clamp(72px,9vw,128px)">
+    <section class="section" style="display:grid;gap:28px;justify-items:start">
       <h2 class="d-xxl">Sin descanso</h2>
-      <p class="lead">Prepárate para el éxito con las mejores herramientas posibles. Después, ponle toda el alma.</p>
+      <p class="lead">Planifica tu energía y después ponle toda el alma.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Ver los productos <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#fuel-planner">Arma tu plan</a></div>
     </section>
   </div>`;
@@ -533,13 +533,15 @@ async function joinWaitlist(data) {
   };
   if (WAITLIST_URL) {
     const res = await fetch(WAITLIST_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) });
-    if (!res.ok) throw new Error('Waitlist endpoint returned ' + res.status);
+    if (!res.ok) throw Object.assign(new Error('Waitlist endpoint returned ' + res.status), { status: res.status });
   } else {
     console.warn('[Soulset] Demo mode: no waitlistEndpoint is set, so this sign-up was not sent anywhere.', payload);
   }
   store.set('waitlist', { email: payload.email, firstName: payload.firstName, province: payload.province, at: payload.submittedAt });
   return payload;
 }
+
+function saveError(err) { return err.status === 429 ? 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.' : 'No pudimos guardar tu lugar. Revisa tu conexión e inténtalo de nuevo.'; }
 
 function picksHTML() {
   if (!cart.length) return `<span class="eyebrow">Tus favoritos</span>
@@ -589,7 +591,7 @@ function bindWaitlist(root) {
       await joinWaitlist({ email, firstName: $('#wlFirst', root).value.trim(), province: $('#wlProvince', root).value, source: 'waitlist-page' });
       location.hash = 'waitlist-confirmed';
     } catch (err) {
-      setErr('wl', `No pudimos guardar tu lugar. Revisa tu conexión e inténtalo de nuevo.`);
+      setErr('wl', saveError(err));
       btn.disabled = false;
     } finally { $('#processing').classList.remove('on'); }
   });
@@ -600,7 +602,7 @@ function viewWaitlistDone() {
   if (!w) return viewWaitlist();
   return `<div class="wrap conf">
     <div style="display:grid;gap:16px"><span class="eyebrow">Lista de espera · confirmado</span><h1 class="d-xxl">Ya estás en la lista${w.firstName ? ', ' + esc(w.firstName) : ''}</h1>
-      <p class="lead">Te escribiremos a <b style="color:var(--bone)">${esc(w.email)}</b> el día que Soulset se lance, con 10% de descuento en tu primer pedido. Mientras tanto: deja de desear, empieza a hacer.</p></div>
+      <p class="lead">Te escribiremos a <b style="color:var(--bone)">${esc(w.email)}</b> el día que Soulset se lance, con 10% de descuento en tu primer pedido.</p></div>
     <div class="conf-grid">
       <div class="conf-box">${picksHTML()}</div>
       <div class="conf-box" style="background:var(--raised)"><h3>Mientras esperas</h3><p>Calcula tus carbohidratos, sodio y líquido por hora, o lee lo que defendemos.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-primary" href="#fuel-planner">Planificador</a><a class="btn btn-secondary" href="#manifesto">Lee el manifiesto</a></div></div>
@@ -621,8 +623,9 @@ function render() {
   else if (h === 'help') { html = viewHelp(); title = 'Ayuda'; }
   else if (h === 'waitlist' || h === 'checkout') { html = viewWaitlist(); bind = bindWaitlist; title = 'Únete a la lista de espera'; nav = 'waitlist'; }
   else if (h === 'waitlist-confirmed' || h === 'order-confirmed') { const done = !!store.get('waitlist', null); html = viewWaitlistDone(); bind = done ? () => {} : bindWaitlist; title = done ? 'Ya estás en la lista' : 'Únete a la lista de espera'; nav = 'waitlist'; }
-  else { html = `<div class="wrap conf"><h1 class="d-xl">Página no encontrada</h1><p class="lead">Esa página no existe. Tu próxima sesión sí.</p><div><a class="btn btn-primary btn-l" href="#shop">Ver todo</a></div></div>`; title = 'No encontrada'; }
-  view.innerHTML = html; bind(view); setTitle(title);
+  else { html = `<div class="wrap conf"><h1 class="d-xl">Página no encontrada</h1><p class="lead">Esa página no existe.</p><div><a class="btn btn-primary btn-l" href="#shop">Ver todo</a></div></div>`; title = 'No encontrada'; }
+  /* Each view gets a fresh element, so listeners bound to the previous view go away with it. */
+  const page = document.createElement('div'); page.innerHTML = html; view.replaceChildren(page); bind(page); setTitle(title);
   $$('.nav a').forEach(a => a.toggleAttribute('aria-current', false));
   $$('.nav a').forEach(a => { if (a.dataset.nav === nav) a.setAttribute('aria-current', 'page'); });
   $('#shopBtn').classList.toggle('is-current', nav.startsWith('shop'));

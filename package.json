@@ -1,0 +1,16 @@
+{
+  "name": "soulset-athletics-website",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "db:migrate": "node scripts/migrate.mjs",
+    "test": "node --test --test-concurrency=1"
+  },
+  "dependencies": {
+    "postgres": "3.4.9"
+  }
+}

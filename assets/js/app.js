@@ -16,7 +16,7 @@ const CATS = {
   hydrate: { name: 'Hydrate', line: 'Sodium you can dose to your sweat, with zero sugar.' },
   build: { name: 'Build', line: 'Creatine monohydrate. One ingredient, every day.' },
   ignite: { name: 'Ignite', line: 'Pre-workout for focus, endurance and pump.' },
-  stacks: { name: 'Stacks', line: 'The right products together, for less.' },
+  stacks: { name: 'Stacks', line: 'Products that work together, at a lower price.' },
 };
 const GEL_USE = ['Take 1 gel every 20–30 minutes in sessions longer than 60 minutes.', 'Aim for 60–90 g of carbohydrate per hour: that is 2–3 gels.', 'Take with a few sips of water. Practise your fuelling in training before race day.'];
 const GEL_ING = 'Water, maltodextrin, fructose, sodium citrate, sodium chloride, natural flavouring, citric acid, preservative (potassium sorbate).';
@@ -32,7 +32,7 @@ const P = [
     use: GEL_USE, ingredients: GEL_ING, pairs: ['carb-gel-30-caffeine', 'sodium'], sub: true },
   { id: 'carb-gel-30-caffeine', code: 'GEL-030C', cat: 'fuel', name: 'Carb Gel 30 Caffeine', tag: 'Level up', level: 1,
     short: '30 g carbs · 200 mg sodium · 50 or 100 mg caffeine',
-    blurb: 'The same 30 g carbs and 200 mg sodium, with caffeine for the hours when your head needs it more than your legs. Choose Level 1 (50 mg) or Level 2 (100 mg). The chevrons on the pack tell you which is which.',
+    blurb: 'The same 30 g carbs and 200 mg sodium, plus caffeine for the late hours of a long session. Choose Level 1 (50 mg) or Level 2 (100 mg); the chevrons on the pack show which is which.',
     stats: [['30', 'g carbs'], ['200', 'mg sodium'], ['50–100', 'mg caffeine']],
     options: [{ key: 'caffeine', label: 'Caffeine', values: [{ v: 'Level 1 · 50 mg · Citrus', img: 'gel-caf50', level: 1 }, { v: 'Level 2 · 100 mg · Cola', img: 'gel-caf100', level: 2 }] },
               { key: 'pack', label: 'Pack', values: [{ v: 'Box of 12', price: 34 }, { v: 'Box of 24', price: 64, note: 'Save 6%' }] }],
@@ -70,7 +70,7 @@ const P = [
     ingredients: 'Creatine monohydrate.', pairs: ['pre-workout', 'strength-stack'], sub: true },
   { id: 'pre-workout', code: 'PRE-200', cat: 'ignite', name: 'Pre-Workout', tag: 'Level 2', level: 2,
     short: '200 mg caffeine · 3.2 g beta-alanine · 6 g citrulline',
-    blurb: 'Switch on before you start. 200 mg of caffeine for focus, 3.2 g of beta-alanine for endurance in hard efforts, and 6 g of L-citrulline malate for blood flow and pump. Clean label, every dose printed.',
+    blurb: '200 mg of caffeine for focus, 3.2 g of beta-alanine for endurance in hard efforts and 6 g of L-citrulline malate for blood flow and pump. Every dose is printed on the label.',
     stats: [['200', 'mg caffeine'], ['3.2', 'g beta-alanine'], ['6', 'g citrulline']],
     options: [{ key: 'flavour', label: 'Flavour', values: [{ v: 'Sour Apple', img: 'pre-sour-apple' }, { v: 'Blood Orange', img: 'pre-blood-orange' }, { v: 'Mango', img: 'pre-mango' }] }],
     basePrice: 45, gallery: ['pre-side', 'pre-top'],
@@ -87,7 +87,7 @@ const P = [
     use: ['Night before: mix your bottles of Fuel Mix 60.', 'Race: 1 bottle per hour plus 1 gel every 30–40 minutes.', 'Hot day: add a Sodium 1000 bottle in the first hour.'], pairs: ['carb-gel-30-caffeine', 'sodium'], sub: false },
   { id: 'strength-stack', code: 'STK-STR', cat: 'stacks', name: 'Strength Stack', tag: 'Save US$9', level: 2,
     short: 'Pre-Workout · Creatine 300 g',
-    blurb: 'Pre-Workout (Blood Orange) and Creatine Monohydrate 300 g. One gets you switched on for today; the other builds for the months ahead.',
+    blurb: 'Pre-Workout (Blood Orange) and Creatine Monohydrate 300 g. Take the pre-workout before training and the creatine every day.',
     stats: [['200', 'mg caffeine'], ['5', 'g creatine'], ['30', 'sessions']],
     options: [], basePrice: 68, compare: 77, gallery: [], main: 'stack-strength',
     contents: ['Pre-Workout · Blood Orange · 30 servings', 'Creatine Monohydrate · 300 g · 60 servings'],
@@ -159,7 +159,7 @@ function renderCart() {
   const sub = subtotal();
   $('#shipBar').innerHTML = `<span><b>Pre-launch.</b> We’re not taking orders yet. Save your picks and join the waitlist for first access.</span>`;
   if (!cart.length) {
-    $('#drawerItems').innerHTML = `<div class="empty"><span class="d-m">Nothing in here yet.</span><p>Stop wishing. Start doing. Pick your fuel.</p><a class="btn btn-primary" href="#shop" data-close>Shop all</a></div>`;
+    $('#drawerItems').innerHTML = `<div class="empty"><span class="d-m">Nothing in here yet.</span><p>Add products and we’ll keep them with your spot on the waitlist.</p><a class="btn btn-primary" href="#shop" data-close>Shop all</a></div>`;
     $('#drawerFoot').innerHTML = '';
   } else {
     $('#drawerItems').innerHTML = cart.map((l, i) => { const p = byId[l.id]; return `
@@ -218,7 +218,7 @@ function viewHome() {
     <div class="hero-copy">
       <span class="eyebrow">Soulset Athletics · Sports nutrition</span>
       <h1 class="d-xxl">Mentality <span class="gt">&gt;</span> everything</h1>
-      <p class="lead">Fuel, hydration and strength products for athletes who put their whole soul into it. Clear doses, no filler, built for heat and long hours.</p>
+      <p class="lead">Carb gels, drink mix, electrolytes, creatine and pre-workout for long sessions in the heat.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Shop the fuel <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#manifesto">Read the manifesto</a></div>
       <div class="hero-facts"><span>Every dose printed on the front</span><span>Built for Caribbean heat</span><span>Subscribe &amp; save 15%</span></div>
     </div>
@@ -232,14 +232,14 @@ function viewHome() {
   </section>
 
   <section class="section-tight wrap" style="padding-top:0">
-    <div class="sec-head"><div><span class="eyebrow">The line-up</span><h2 class="d-l">Your passion, our fuel</h2></div><a class="btn-ghost btn" href="#shop">View all 8 <span class="edge">›</span></a></div>
+    <div class="sec-head"><div><span class="eyebrow">The line-up</span><h2 class="d-l">Start with these</h2></div><a class="btn-ghost btn" href="#shop">View all ${P.length} <span class="edge">›</span></a></div>
     <div class="grid" id="homeGrid">${featured.map(id => card(byId[id])).join('')}</div>
   </section>
 
   <section class="band"><div class="wrap section" style="display:grid;gap:28px">
     <span class="eyebrow">Our manifesto</span>
     <h2 class="d-xl" style="max-width:14ch">Put your whole soul into it</h2>
-    <p class="lead" style="color:#3A3936;max-width:60ch">Your mind is the first thing you have to convince. Soulset is a constant reminder to stop wishing and start doing: believe in your potential, take action, earn the results, and believe again.</p>
+    <p class="lead" style="color:#3A3936;max-width:60ch">Your mind is the first thing you have to convince. Believe in your potential, act on it, earn the results, then start again.</p>
     <div><a class="btn btn-primary btn-l" href="#manifesto" style="background:var(--void);color:var(--bone)">Read the manifesto <span class="edge">›</span></a></div>
   </div></section>
 
@@ -254,13 +254,13 @@ function viewHome() {
       <div><span class="mono">01 · DURING</span><span class="d-s">Carb Gel 30</span><p>30 g carbs and 200 mg sodium per gel. 2–3 an hour.</p></div>
       <div><span class="mono">02 · IN THE BOTTLE</span><span class="d-s">Fuel Mix 60</span><p>60 g carbs and 500 mg sodium per bottle.</p></div>
       <div><span class="mono">03 · IN THE HEAT</span><span class="d-s">Sodium</span><p>500, 1000 or 1500 mg. Zero sugar.</p></div>
-      <div><span class="mono">04 · EVERY DAY</span><span class="d-s">Creatine</span><p>5 g. One ingredient. Consistency wins.</p></div>
-      <div><span class="mono">05 · BEFORE</span><span class="d-s">Pre-Workout</span><p>Caffeine, beta-alanine, citrulline. Switch on.</p></div>
+      <div><span class="mono">04 · EVERY DAY</span><span class="d-s">Creatine</span><p>5 g a day. One ingredient.</p></div>
+      <div><span class="mono">05 · BEFORE</span><span class="d-s">Pre-Workout</span><p>Caffeine, beta-alanine and citrulline, 20–30 minutes before.</p></div>
     </div>
   </section>
 
-  <section class="section-tight" style="border-top:1px solid var(--line)"><div class="wrap news">
-    <div style="display:grid;gap:12px"><span class="eyebrow">Join the waitlist</span><h2 class="d-l">Stay relentless</h2><p class="lead">Be first to know when Soulset launches, and get 10% off your first order.</p></div>
+  <section class="section-tight"><div class="wrap news">
+    <div style="display:grid;gap:12px"><span class="eyebrow">Join the waitlist</span><h2 class="d-l">Get 10% off at launch</h2><p class="lead">Join the waitlist and we’ll email you when orders open, with 10% off your first order.</p></div>
     <div><form id="newsForm" novalidate><label class="sr" for="newsEmail">Email address</label><input id="newsEmail" type="email" placeholder="you@email.com" autocomplete="email" required><button class="btn btn-primary" type="submit">Join the waitlist</button></form><p class="news-msg" id="newsMsg"></p></div>
   </div></section>`;
 }
@@ -271,7 +271,7 @@ function bindHome(root) {
     if (!EMAIL_RE.test(v)) { m.style.color = 'var(--danger)'; m.textContent = 'Enter a valid email address, like you@email.com.'; return; }
     btn.disabled = true; m.style.color = 'var(--muted)'; m.textContent = 'Saving your spot…';
     try { await joinWaitlist({ email: v, source: 'home' }); m.style.color = 'var(--success)'; m.textContent = `You’re on the list. We’ll email you at launch with 10% off your first order.`; form.reset(); }
-    catch (err) { m.style.color = 'var(--danger)'; m.textContent = `We couldn’t save your spot. Check your connection and try again.`; }
+    catch (err) { m.style.color = 'var(--danger)'; m.textContent = saveError(err); }
     finally { btn.disabled = false; }
   });
 }
@@ -325,7 +325,7 @@ function viewProduct(p) {
           <div class="buy-row"><div class="qty"><button type="button" data-pq="-1" aria-label="Decrease quantity">−</button><input type="number" id="pdpQty" min="1" max="99" value="1" aria-label="Quantity"><button type="button" data-pq="1" aria-label="Increase quantity">+</button></div>
             <button class="btn btn-primary btn-l" type="submit" id="addBtn">Add to cart</button></div>
         </form>
-        <div class="assure"><div><b>Free shipping</b>Orders over US$75</div><div><b>Every dose printed</b>On the front of every pack</div><div><b>30-day guarantee</b>Unopened, unhappy? Send it back</div></div>
+        <div class="assure"><div><b>Free shipping</b>Orders over US$75</div><div><b>Every dose printed</b>On the front of every pack</div><div><b>30-day returns</b>On unopened products</div></div>
         <div class="acc">
           ${p.nutrition ? `<details open><summary>What's inside</summary><div class="acc-body">${nutritionHTML(p.nutrition)}</div></details>` : ''}
           <details ${p.nutrition ? '' : 'open'}><summary>How to use</summary><div class="acc-body"><ul style="margin:0;padding-left:18px;display:grid;gap:6px">${p.use.map(u => `<li>${esc(u)}</li>`).join('')}</ul></div></details>
@@ -334,7 +334,7 @@ function viewProduct(p) {
         </div>
       </div>
     </div>
-    <section class="section-tight" style="border-top:1px solid var(--line)"><div class="sec-head"><div><span class="eyebrow">Pairs well with</span><h2 class="d-m">Complete the stack</h2></div></div>
+    <section class="section-tight"><div class="sec-head"><div><span class="eyebrow">Pairs well with</span><h2 class="d-m">Complete the stack</h2></div></div>
       <div class="grid">${[...p.pairs, P.find(x => x.id !== p.id && !p.pairs.includes(x.id) && x.cat !== p.cat).id].slice(0, 3).map(id => card(byId[id])).join('')}</div></section>
   </div>`, bind(root) {
     const upd = () => {
@@ -420,7 +420,7 @@ function bindPlanner(root) {
   f.addEventListener('input', run); f.addEventListener('change', run); run();
 }
 function viewPlanner() {
-  return `<div class="wrap"><div class="shop-top"><span class="eyebrow">Fuel planner</span><h1 class="d-xl">Set yourself up for success</h1><p class="lead">The best tools only work with a plan. Enter your session and we'll work out carbs, sodium and fluid per hour, then build the basket for you.</p></div>
+  return `<div class="wrap"><div class="shop-top"><span class="eyebrow">Fuel planner</span><h1 class="d-xl">Plan your fuel</h1><p class="lead">Enter your session and we'll work out carbs, sodium and fluid per hour, then build the basket for you.</p></div>
     <div class="section-tight">${plannerHTML()}</div>
     <div class="section-tight" style="padding-top:0;display:grid;gap:20px;max-width:70ch;color:var(--muted)">
       <h2 class="d-m" style="color:var(--bone)">How the numbers work</h2>
@@ -436,9 +436,9 @@ function viewManifesto() {
     ['Mindset over everything', 'The head goes first and the body follows. Without the right winning mindset, the challenges between you and your aspirations stay where they are.'],
     ['Invest in yourself', 'Your goals and ambitions deserve real investment: time, effort, money, sleep, discipline. You are the project.'],
     ['Set yourself up to win', 'Use the best tools available. Our nutrition is one of them. A plan beats hope every time.'],
-    ['Empowerment, passion, winning mentality', 'We speak to people who expect to win, and who act like it long before the result shows up.'],
+    ['Empowerment, passion, winning mentality', 'For people who expect to win and train like it.'],
     ['Whole soul', 'Half effort is not an option. Whatever you are doing, put all of yourself into it.'],
-    ['Stay relentless', 'Keep going when it stops being fun. That is where the work actually starts.'],
+    ['Stay relentless', 'Keep going when it stops being fun.'],
   ];
   return `<div class="wrap">
     <section class="mf-hero">
@@ -446,7 +446,7 @@ function viewManifesto() {
       <div class="def"><div class="def-word">Soul<br>set</div>
         <div class="def-body"><span class="pos">soul·set /ˈsōlˌset/ · noun</span>
           <p style="font-size:22px;color:var(--bone)">The empowered attitude of putting your whole soul into something.</p>
-          <blockquote>"Her soulset showed up long before race day. It lived in the early starts, the quiet miles, and the work no one saw."</blockquote>
+          <blockquote>“Her soulset got her through the last 10 km.”</blockquote>
           <p style="color:var(--muted)">The name is two words pressed into one: <b style="color:var(--bone)">soul</b> and <b style="color:var(--bone)">mindset</b>. It means putting your whole soul into whatever you are doing.</p></div></div>
     </section>
 
@@ -454,8 +454,8 @@ function viewManifesto() {
       <h2 class="d-xl">Put your whole soul into it</h2>
       <div class="copy">
         <p>Soulset exists to push one belief: mentality is the greater factor in reaching any goal. Talent, genetics and gear matter. They come second.</p>
-        <p>The empowered attitude of putting your whole soul into something gives you a sense of control in difficult situations. When the session hurts, when the race goes wrong, when life gets loud, the decision to keep going is still yours.</p>
-        <p>Without the right winning mindset, it isn't possible to overcome the challenges that lie between us and our aspirations. <b style="color:var(--bone)">Your mind is the first thing you have to convince.</b></p>
+        <p>Putting your whole soul into something gives you control in hard moments. When a session hurts or a race goes wrong, the decision to keep going is still yours.</p>
+        <p><b style="color:var(--bone)">Your mind is the first thing you have to convince.</b></p>
       </div>
     </section>
   </div>
@@ -463,18 +463,18 @@ function viewManifesto() {
   <section class="band"><div class="wrap section" style="display:grid;gap:20px;justify-items:start">
     <span class="eyebrow">The rule</span>
     <h2 class="d-xxl">Mentality <span class="gt">&gt;</span> everything</h2>
-    <p class="lead" style="color:#3A3936">Everything we make, write and print is a reminder of it, from the front of a gel to the lid of a tub.</p>
+    <p class="lead" style="color:#3A3936">It’s on the front of every gel and the lid of every tub.</p>
   </div></section>
 
   <div class="wrap">
     <section class="section" style="display:grid;gap:32px">
-      <div class="sec-head" style="margin:0"><div><span class="eyebrow">The Soulset loop</span><h2 class="d-l">Stop wishing. Start doing.</h2><p class="lead">We want this brand to be a constant reminder to act. Results don't come from wanting them. They come from a loop you repeat until it becomes who you are.</p></div></div>
+      <div class="sec-head" style="margin:0"><div><span class="eyebrow">The Soulset loop</span><h2 class="d-l">Stop wishing. Start doing.</h2><p class="lead">Results come from a loop you repeat: believe, act, earn the results, believe again.</p></div></div>
       <div class="loop">
         <div><span class="mono">01</span><span class="d-s">Believe potential</span><p>See what you could become before anyone else does.</p></div>
-        <div><span class="mono">02</span><span class="d-s">Take action</span><p>Stop wishing. Start doing. Today, not Monday.</p></div>
-        <div><span class="mono">03</span><span class="d-s">Results</span><p>Proof, earned one session at a time.</p></div>
+        <div><span class="mono">02</span><span class="d-s">Take action</span><p>Today, not Monday.</p></div>
+        <div><span class="mono">03</span><span class="d-s">Results</span><p>Earned one session at a time.</p></div>
         <div><span class="mono">04</span><span class="d-s">Believe</span><p>Results feed belief. Belief starts the next round.</p></div>
-        <div><span class="mono">05</span><span class="d-s">Success</span><p>Not a finish line. The loop, repeated until it's who you are.</p></div>
+        <div><span class="mono">05</span><span class="d-s">Success</span><p>The loop, repeated until it becomes habit.</p></div>
       </div>
     </section>
 
@@ -489,9 +489,9 @@ function viewManifesto() {
         <ol><li><span class="mono">01</span><div><b>Believe</b><p>The first chevron. Convince your mind.</p></div></li><li><span class="mono">02</span><div><b>Act</b><p>The second. Do the work, especially when you don't feel like it.</p></div></li><li><span class="mono">03</span><div><b>Results</b><p>The third. Earned, then used to believe again.</p></div></li></ol></div>
     </section>
 
-    <section class="section" style="padding-top:0;display:grid;gap:28px;justify-items:start;border-top:1px solid var(--line);padding-top:clamp(72px,9vw,128px)">
+    <section class="section" style="display:grid;gap:28px;justify-items:start">
       <h2 class="d-xxl">Stay relentless</h2>
-      <p class="lead">Set yourself up for success with the best tools possible. Then put your whole soul into it.</p>
+      <p class="lead">Plan your fuel, then put your whole soul into it.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Shop the fuel <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#fuel-planner">Build a fuel plan</a></div>
     </section>
   </div>`;
@@ -530,13 +530,15 @@ async function joinWaitlist(data) {
   };
   if (WAITLIST_URL) {
     const res = await fetch(WAITLIST_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) });
-    if (!res.ok) throw new Error('Waitlist endpoint returned ' + res.status);
+    if (!res.ok) throw Object.assign(new Error('Waitlist endpoint returned ' + res.status), { status: res.status });
   } else {
     console.warn('[Soulset] Demo mode: no waitlistEndpoint is set, so this sign-up was not sent anywhere.', payload);
   }
   store.set('waitlist', { email: payload.email, firstName: payload.firstName, province: payload.province, at: payload.submittedAt });
   return payload;
 }
+
+function saveError(err) { return err.status === 429 ? 'Too many attempts. Wait a few minutes and try again.' : 'We couldn’t save your spot. Check your connection and try again.'; }
 
 function picksHTML() {
   if (!cart.length) return `<span class="eyebrow">Your picks</span>
@@ -586,7 +588,7 @@ function bindWaitlist(root) {
       await joinWaitlist({ email, firstName: $('#wlFirst', root).value.trim(), province: $('#wlProvince', root).value, source: 'waitlist-page' });
       location.hash = 'waitlist-confirmed';
     } catch (err) {
-      setErr('wl', `We couldn’t save your spot. Check your connection and try again.`);
+      setErr('wl', saveError(err));
       btn.disabled = false;
     } finally { $('#processing').classList.remove('on'); }
   });
@@ -597,7 +599,7 @@ function viewWaitlistDone() {
   if (!w) return viewWaitlist();
   return `<div class="wrap conf">
     <div style="display:grid;gap:16px"><span class="eyebrow">Waitlist · confirmed</span><h1 class="d-xxl">You’re on the list${w.firstName ? ', ' + esc(w.firstName) : ''}</h1>
-      <p class="lead">We’ll email <b style="color:var(--bone)">${esc(w.email)}</b> the day Soulset launches, with 10% off your first order. Until then: stop wishing, start doing.</p></div>
+      <p class="lead">We’ll email <b style="color:var(--bone)">${esc(w.email)}</b> the day Soulset launches, with 10% off your first order.</p></div>
     <div class="conf-grid">
       <div class="conf-box">${picksHTML()}</div>
       <div class="conf-box" style="background:var(--raised)"><h3>While you wait</h3><p>Work out your carbs, sodium and fluid per hour, or read what we stand for.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-primary" href="#fuel-planner">Fuel planner</a><a class="btn btn-secondary" href="#manifesto">Read the manifesto</a></div></div>
@@ -618,8 +620,9 @@ function render() {
   else if (h === 'help') { html = viewHelp(); title = 'Help'; }
   else if (h === 'waitlist' || h === 'checkout') { html = viewWaitlist(); bind = bindWaitlist; title = 'Join the waitlist'; nav = 'waitlist'; }
   else if (h === 'waitlist-confirmed' || h === 'order-confirmed') { const done = !!store.get('waitlist', null); html = viewWaitlistDone(); bind = done ? () => {} : bindWaitlist; title = done ? 'You’re on the list' : 'Join the waitlist'; nav = 'waitlist'; }
-  else { html = `<div class="wrap conf"><h1 class="d-xl">Page not found</h1><p class="lead">That page doesn't exist. Your next session does.</p><div><a class="btn btn-primary btn-l" href="#shop">Shop all</a></div></div>`; title = 'Not found'; }
-  view.innerHTML = html; bind(view); setTitle(title);
+  else { html = `<div class="wrap conf"><h1 class="d-xl">Page not found</h1><p class="lead">That page doesn’t exist.</p><div><a class="btn btn-primary btn-l" href="#shop">Shop all</a></div></div>`; title = 'Not found'; }
+  /* Each view gets a fresh element, so listeners bound to the previous view go away with it. */
+  const page = document.createElement('div'); page.innerHTML = html; view.replaceChildren(page); bind(page); setTitle(title);
   $$('.nav a').forEach(a => a.toggleAttribute('aria-current', false));
   $$('.nav a').forEach(a => { if (a.dataset.nav === nav) a.setAttribute('aria-current', 'page'); });
   $('#shopBtn').classList.toggle('is-current', nav.startsWith('shop'));

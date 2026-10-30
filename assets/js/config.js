@@ -1,4 +1,4 @@
-/* Where waitlist sign-ups are sent. Leave empty to run in demo mode (sign-ups stay in the visitor's browser).
-   Works with any endpoint that accepts a JSON POST, e.g. Formspree ("https://formspree.io/f/xxxxxxx"). See README.
+/* Where waitlist sign-ups are sent: the /api/waitlist function in api/waitlist.js, which saves them to Postgres
+   and emails a confirmation through Resend (see README). Set to '' to run in demo mode (sign-ups stay in the browser).
    Shared by the English (index.html) and Spanish (es/index.html) sites. */
-window.SOULSET_CONFIG = { waitlistEndpoint: '' };
+window.SOULSET_CONFIG = { waitlistEndpoint: '/api/waitlist' };
