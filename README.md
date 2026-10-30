@@ -4,6 +4,8 @@ Pre-launch website for **Soulset Athletics**, sports nutrition for people who pu
 
 Built with **Next.js 16** (App Router, React 19, TypeScript) and deployed on **Vercel**. Sign-ups are stored in **Postgres** (Neon) and confirmed by email through **Resend**. Checkout with a Dominican payment gateway (Azul or CardNet) is built on the server and switched off until launch.
 
+Team rules for working on it (in Spanish): [docs/guia-de-desarrollo.md](docs/guia-de-desarrollo.md).
+
 ## Pages
 
 English has no prefix, Spanish lives under `/es`, and every page exists in both:
