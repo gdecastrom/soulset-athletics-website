@@ -2,121 +2,147 @@
 
 Pre-launch website for **Soulset Athletics**, sports nutrition for people who put their whole soul into it. *Mentality > Everything.*
 
-It's a static, dependency-free single-page site (HTML, CSS and vanilla JavaScript, hash-routed). There's no build step: open `index.html` or serve the folder from any static host.
+Built with **Next.js 16** (App Router, React 19, TypeScript) and deployed on **Vercel**. Sign-ups are stored in **Postgres** (Neon) and confirmed by email through **Resend**. Checkout with a Dominican payment gateway (Azul or CardNet) is built on the server and switched off until launch.
 
-## Pre-launch mode: waitlist instead of checkout
+Team rules for working on it (in Spanish): [docs/guia-de-desarrollo.md](docs/guia-de-desarrollo.md).
 
-Orders aren't open yet, so there is no checkout or payment flow. Visitors can still browse the line-up, use the Fuel Planner and build a cart, which works as a wishlist. Every purchase path leads to the waitlist:
+## Pages
 
-- **Cart drawer** → "Join the waitlist" (`#waitlist`)
-- **Waitlist page** (`#waitlist`): email (required), first name (optional), Dominican province (optional), plus the cart contents as "your picks"
-- **Confirmation** (`#waitlist-confirmed`)
-- **Home page sign-up** posts to the same waitlist
-- Old links to `#checkout` and `#order-confirmed` redirect to the waitlist
+English has no prefix, Spanish lives under `/es`, and every page exists in both:
 
-### Connecting the waitlist (required before going live)
+| Page | URL |
+| --- | --- |
+| Home | `/`, `/es` |
+| Shop, by category | `/shop`, `/shop/fuel` · `hydrate` · `build` · `ignite` · `stacks` |
+| Product | `/products/<id>`, e.g. `/products/sodium` |
+| Fuel planner | `/fuel-planner` |
+| Manifesto, help | `/manifesto`, `/help` |
+| Waitlist | `/waitlist` → `/waitlist/confirmed` |
+| After paying (launch) | `/order?status=paid&number=SA-000123` |
 
-Out of the box the site runs in **demo mode**: sign-ups are only kept in the visitor's browser and nothing is sent anywhere (a warning is logged to the console). To collect emails, set the endpoint in `assets/js/config.js` (shared by the English and Spanish sites):
+Product, category and content pages are pre-rendered at build time, with their own titles, descriptions, social previews, `hreflang` links and a `sitemap.xml`. Links to the first version's hash routes (`/#p-sodium`, `/#shop-fuel`…) are sent to the new pages.
 
-```js
-window.SOULSET_CONFIG = { waitlistEndpoint: 'https://formspree.io/f/your-form-id' };
+`proxy.ts` serves the English pages from `app/[lang]` (`/shop` is rendered as `[lang] = en`) and redirects any `/en/...` URL to its unprefixed address.
+
+## Pre-launch: waitlist instead of checkout
+
+Orders aren't open yet. Visitors browse the line-up, use the Fuel Planner and build a cart, which works as a wishlist; every purchase path leads to the waitlist. The cart is kept in the browser (`localStorage`), shared by both languages.
+
+### How sign-ups are stored
+
+The waitlist form and the home page box `POST` to `/api/waitlist` (`app/api/waitlist/route.ts`), which:
+
+1. validates everything again on the server (email, known province, known products, size limits), refuses cross-site requests and rate-limits each IP to 5 requests per 10 minutes;
+2. saves it as a `customer`, a `waitlist_signup` and the cart as `waitlist_pick` rows (one per product variant). Signing up again with the same email updates the same rows instead of creating duplicates;
+3. emails a confirmation in the visitor's language through Resend, with an unsubscribe link (`/api/unsubscribe`, signed so nobody can unsubscribe someone else), and optionally a short notice to the team (`NOTIFY_EMAIL`).
+
+If email isn't configured yet, sign-ups are still saved. Useful queries (Neon SQL editor):
+
+```sql
+select c.email, c.first_name, p.name as province, s.site_language, s.created_at
+from waitlist_signup s join customer c on c.id = s.customer_id left join province p on p.id = c.province_id
+where s.unsubscribed_at is null order by s.created_at desc;
+
+select * from waitlist_pick_demand;   -- which variants people want most
 ```
 
-The site sends a `POST` with a JSON body and treats any 2xx response as success. Any service that accepts JSON from the browser (with CORS) works. The quickest option is [Formspree](https://formspree.io): create a form, copy its endpoint URL, paste it above, and sign-ups arrive in your inbox and the Formspree dashboard, exportable as CSV.
+## Editing content
 
-Payload sent for each sign-up:
+- **Products** (names, options, prices, nutrition, copy in both languages): `lib/catalog-data.ts`. The pages read it, and every deploy copies products, variants and prices into the database (price changes are kept as history). Never change an existing option value id: it's part of the SKU.
+- **Interface copy** (headings, buttons, FAQ, manifesto): `lib/dict.ts`, English first, then Spanish. Spanish always addresses the visitor as *tú*. A test fails if the two languages don't have the same entries.
+- **Styles**: `app/globals.css` (design tokens at the top).
+- **Images**: `public/img/*.webp`, square 900×900 for products.
+- **Cinematic photos and video** (home hero, home waitlist sign-up, manifesto clip and closer): `public/media/`, how to swap them in [docs/media.md](docs/media.md).
 
-```json
-{
-  "email": "athlete@email.com",
-  "firstName": "Gabo",
-  "province": "Santiago",
-  "picks": [{ "id": "sodium", "name": "Sodium", "options": "1000 mg", "qty": 1, "subscribe": false }],
-  "picksSummary": "1 × Sodium (1000 mg)",
-  "source": "waitlist-page",
-  "language": "es-DO",
-  "siteLanguage": "es",
-  "submittedAt": "2026-10-30T13:50:14.279Z"
-}
-```
+## Security
 
-`source` is `waitlist-page` or `home`. `province` is one of the 31 provinces or Distrito Nacional, or empty if the visitor didn't choose (and always empty from the home sign-up). `siteLanguage` is `en` or `es`, depending on which version of the site the visitor used. `picks` tells you which products people want most before launch. A hidden honeypot field filters out simple bots.
-
-## Spanish site
-
-A Spanish version lives at `/es/` (`es/index.html` + `assets/js/app.es.js`), with an EN/ES switch in the header that keeps the current page. Routes (`#shop`, `#p-<id>`, …) are the same in both.
-
-`app.es.js` is a translated copy of `app.js`: same logic, Spanish copy and catalogue text. **When you change behaviour or prices in one, make the same change in the other.** Spanish copy always addresses the visitor as *tú* (te, tu, tus; imperatives like "Únete", "Elige"), never *usted*. Each language keeps its own cart and waitlist state in the browser (storage keys `ss_` and `ss_es_`), because cart lines store option names in their own language.
+- **No way to edit orders from the internet.** The only order endpoints are `/api/checkout`, which can only *create* a pending order, and `/api/payment-callback`, which only accepts results it can verify with the payment provider. Nothing reads or updates an order by id from the browser, and the order page never reads the database.
+- **Prices come from the server.** Totals are computed from `lib/catalog-data.ts`; whatever price the browser sends is ignored.
+- **The database enforces it too.** Triggers refuse any change to an order's amounts, customer or delivery details after it's created, allow status changes only forward (`pending` → `paid` / `declined` / `cancelled` / `error`, `paid` → `refunded`), check that an order's subtotal matches its items, and refuse deletes. Order items, payment events and prices are append-only. This holds even with a bug in the app.
+- **Least-privilege database login.** The migrations create `soulset_app`, which can add rows and update only the columns the site needs: no deletes (except a wishlist's picks), no schema changes, can't disable the triggers. The site uses that role; the owner login is only for deploys and for the team in the Neon console.
+- **Headers.** A strict Content Security Policy (own scripts, styles, fonts and images only), HSTS, `X-Frame-Options: DENY`, `nosniff`, and no indexing of `/api` or preview deployments.
+- **Card data never touches the site**: Azul and CardNet both offer hosted payment pages.
 
 ## Run locally
 
 ```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
+npm install
+MIGRATION_DATABASE_URL=postgres://… npm run db:release   # migrations + catalogue sync, as the owner
+DATABASE_URL=postgres://… APP_SECRET=dev npm run dev     # http://localhost:3000
 ```
 
-(Opening `index.html` directly from disk also works, though some browsers block local font loading that way.)
+Checks:
 
-## Deploy with GitHub Pages
+```bash
+npm run typecheck
+npm run build
+TEST_DATABASE_URL=postgres://… npm test   # drops and rebuilds that database's schema: use a throwaway one
+```
 
-1. In the repository, go to **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**, branch `main`, folder `/ (root)`, and save.
-3. The site is published at `https://<your-username>.github.io/soulset-athletics-website/` after a minute or two. A custom domain (e.g. `soulsetathletics.com`) can be added on the same page.
+`npm test` runs the catalogue, copy and planner checks, plus the API tests against a real Postgres when `TEST_DATABASE_URL` is set. To prove the restricted role is enough, set `TEST_ADMIN_DATABASE_URL` to the owner and `TEST_DATABASE_URL` to `soulset_app`. Tests need Node 22.18 or newer.
+
+## Deploy on Vercel
+
+1. **Project.** Import the GitHub repository in Vercel (framework: Next.js, defaults are fine).
+2. **Database.** Create a Neon project (or *Storage* → *Create database* → **Neon** in Vercel).
+   1. Set `MIGRATION_DATABASE_URL` to the owner's connection string. Every build runs `scripts/release.ts` first: pending migrations, then the catalogue sync.
+   2. After the first deploy, give the site's login a password once, in the Neon SQL editor: `alter role soulset_app login password '…';`
+   3. Set `DATABASE_URL` to the `soulset_app` connection string (use the `-pooler` host).
+   4. Give preview deployments their own Neon branch so tests on previews never touch real sign-ups or orders.
+3. **Secret.** Add `APP_SECRET` (`openssl rand -base64 32`). Don't change it later: it signs the unsubscribe links already sent.
+4. **Resend.** Verify the domain in Resend (DNS records at your registrar), create an API key, then set `RESEND_API_KEY`, `EMAIL_FROM` (e.g. `Soulset Athletics <hola@soulsetathletics.com>`), and optionally `EMAIL_REPLY_TO` and `NOTIFY_EMAIL`.
+5. **Domain.** Add the custom domain in Vercel → *Domains* and set `SITE_URL` to it, so canonical links, the sitemap, social previews and email links use it.
+
+The code is plain Postgres: moving to Railway later means pointing both URLs there and redeploying. The design, business rules and ERD are in [docs/database.md](docs/database.md), the column-by-column dictionary in [docs/data-dictionary.md](docs/data-dictionary.md). All variables are listed in `.env.example`.
+
+## Payments (ready for launch, off for now)
+
+Checkout returns 404 until `CHECKOUT_ENABLED=true`. What's in place:
+
+- `POST /api/checkout` validates delivery details, prices the cart on the server, creates a pending order (`SA-000123`) and returns where to send the customer: a redirect, or a form to auto-submit to the gateway's hosted page.
+- `/api/payment-callback` verifies the result with the provider, records it in `payment_events`, moves the order out of `pending` once, and sends the customer to `/order`.
+- Providers in `lib/server/payments/`: `test` (fake gateway for local and preview testing, refused in production), and `azul` / `cardnet` stubs that describe what each one needs. The interface is in `lib/server/payments/index.ts`.
+
+To open orders: get the merchant account and sandbox credentials from Azul or CardNet, implement that provider file against their docs, build the checkout page, add the gateway's hosted-page origin to `PAYMENT_FORM_ORIGINS` (the security policy blocks posting forms anywhere else), and try it on a preview deployment, first with `PAYMENT_PROVIDER=test`, then with the provider's sandbox. Finally set `CHECKOUT_ENABLED=true`, `PAYMENT_PROVIDER` and `SHIPPING_FEE_USD` in production.
 
 ## Structure
 
 ```
-index.html              Page shell, header, footer, cart drawer (English)
-es/index.html           Spanish page shell
-assets/css/site.css     Design tokens and all styles
-assets/js/config.js     Waitlist endpoint (shared)
-assets/js/app.js        Catalogue data, routing, cart, fuel planner, waitlist (English)
-assets/js/app.es.js     Spanish copy of app.js
-assets/fonts/           Saira Extra Condensed, Barlow, IBM Plex Mono (subset woff2)
-assets/img/             Product renders (webp)
-assets/favicon.svg      Double-chevron mark
+app/[lang]/             Pages (layout, home, shop, products, fuel-planner, manifesto, help, waitlist, order)
+app/api/                waitlist, unsubscribe, checkout, payment-callback
+app/globals.css         Design tokens and all styles
+app/fonts/              Saira Extra Condensed, Barlow, IBM Plex Mono (subset woff2, loaded with next/font)
+components/             Header, footer, cart, product page, fuel planner, waitlist forms
+lib/catalog-data.ts     Products in both languages
+lib/catalog.ts          Product types, prices, server-side cart pricing
+lib/dict.ts             Interface copy in both languages
+lib/planner.ts          Fuel planner maths
+lib/server/             Database, validation, emails, rate limiting, payment providers (server only)
+db/migrations/          Numbered SQL migrations (never edited once applied)
+docs/database.md        Database design: rules, entities, ERD, history
+docs/data-dictionary.md Every table and column, generated from the schema
+scripts/release.ts      Runs before each build: migrations + catalogue sync
+proxy.ts                English / Spanish routing
+test/                   Catalogue, copy, planner and API tests (npm test)
 ```
-
-Routes: `#home`, `#shop`, `#shop-fuel` / `-hydrate` / `-build` / `-ignite` / `-stacks`, `#p-<product-id>`, `#fuel-planner`, `#manifesto`, `#help`, `#waitlist`, `#waitlist-confirmed`.
-
-The product catalogue (names, options, prices, nutrition) lives in the `P` array at the top of `assets/js/app.js`.
-
-## Cinematic footage
-
-Full-bleed athlete imagery sits behind four sections:
-
-- **Home hero:** still photo in full colour (`.cine-color`)
-- **Home waitlist sign-up:** still photo, black-and-white grade (`.cine-bw`)
-- **Manifesto mid-page line:** looping clip
-- **Manifesto closer:** still photo, black-and-white grade, mirrored so the face sits clear of the copy (`.cine-flip`)
-
-Everything lives in `assets/media/`. A clip is a pair, `<name>.mp4` plus a `<name>.jpg` poster, used as `cineMedia('<name>')`. A still is `<name>.webp`, used as `cineStill('<name>')`. Both helpers are in `app.js` / `app.es.js`. The grade is applied in CSS, so footage can be shot in colour.
-
-- A clip's poster shows first. The video loads only when its section nears the viewport and pauses when it scrolls away.
-- Visitors with reduced motion or Data Saver turned on only see the poster.
-- To swap in your own shoot, replace the files and keep the names, or add new ones and change the name in both scripts. Aim for 720p, 6–15 s seamless loops, muted, under ~5 MB each, and stills about 2400 px wide.
-- **No visible brands:** clothing, shoes and gear in any image must show no logos.
-
-The current media are placeholders:
-
-- [Mixkit](https://mixkit.co/license/#videoFree) clip, free for commercial use with no attribution required: sweat-bw 50964
-- [Unsplash](https://unsplash.com/license) stills, free for commercial use: run-track (photo-1766970096346), gym-barbell (photo-1639653816698), gym-sweat (photo-1570095354203)
 
 ## Brand system
 
-- **Colours:** Soulset Black `#0A0A0A`, Bone `#F2F0EB`, Ignite `#FF5A1F` (actions and the ">" only; text on Ignite is always black)
+- **Colours:** Soulset Black `#0A0A0A`, Bone `#F2F0EB`, Ignite `#FF5A1F` (actions and the ">" only; text on Ignite is always black). Home page sections alternate black and bone (`.band`); on bone, Ignite text darkens to `#B23A0C`
 - **Type:** Saira Extra Condensed 800/900 (display, uppercase), Barlow 400–600 (body), IBM Plex Mono (nutrition data)
 - **Mark:** SA level-up mark, a squared S with stacked chevrons (Believe → Act → Results)
 
 ## Before launch
 
-- [ ] Connect the waitlist endpoint (see above)
+- [ ] Deploy on Vercel with Neon and Resend (see *Deploy on Vercel*)
+- [ ] Custom domain, and `SITE_URL` set to it
 - [ ] Real formulations and nutrition panels from the manufacturer
 - [ ] Final prices and currency (USD vs RD$)
 - [ ] Real product photography (current images are 3D renders)
-- [ ] Own athlete footage to replace the Mixkit placeholders in `assets/media/`, ideally with Soulset product in shot
+- [ ] Own athlete footage to replace the placeholder photos and clip in `public/media/`, ideally with Soulset product in shot (`docs/media.md`)
 - [ ] Legal pages (privacy policy, terms), and a privacy note on the waitlist form
-- [ ] When orders open: payment processor (e.g. Azul, CardNet or Stripe) and a real checkout
+- [ ] Standard shipping fee below US$75 (needed for `SHIPPING_FEE_USD`)
+- [ ] When orders open: Azul or CardNet merchant account, then finish *Payments* above
 
 ## Licences
 
