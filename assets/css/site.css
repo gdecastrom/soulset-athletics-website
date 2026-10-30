@@ -70,6 +70,8 @@ p { margin:0; }
 .head-actions { margin-left:auto; display:flex; align-items:center; gap:8px; }
 .icon-btn { background:none; border:0; min-width:44px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; color:var(--bone); padding:0 8px; }
 .icon-btn svg { width:22px; height:22px; }
+.lang-switch { min-width:44px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; letter-spacing:.14em; text-decoration:none; color:var(--muted); }
+.lang-switch:hover { color:var(--bone); }
 .cart-count { font-family:var(--mono); font-size:12px; min-width:22px; height:22px; padding:0 6px; border-radius:9999px; background:var(--ignite); color:var(--on-ignite); display:inline-flex; align-items:center; justify-content:center; }
 .cart-count[data-n="0"] { background:var(--raised-2); color:var(--muted); }
 .menu-btn { display:none; }
