@@ -1,12 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Chevrons } from '../../components/Logos.tsx';
+import { Media } from '../../components/Media.tsx';
 import { FuelPlanner } from '../../components/FuelPlanner.tsx';
 import { ProductCard } from '../../components/ProductCard.tsx';
 import { NewsForm } from '../../components/WaitlistForms.tsx';
 import { CATS, getProduct, imgSrc, PRODUCTS } from '../../lib/catalog.ts';
 import { dict } from '../../lib/dict.ts';
 import { href, tr, type Lang } from '../../lib/i18n.ts';
+import { mediaSlot, withMedia } from '../../lib/server/media.ts';
 import { alternates, type PageProps } from '../../lib/site.ts';
 
 export async function generateMetadata({ params }: PageProps) {
@@ -21,12 +23,16 @@ export default async function Home({ params }: PageProps) {
   const lang = (await params).lang as Lang;
   const h = dict(lang).home;
   const l = (path: string) => href(lang, path);
+  const heroMedia = mediaSlot('hero', { video: true });
+  const reelMedia = mediaSlot('training', { video: true });
+  const portrait = mediaSlot('portrait');
+  const relentless = mediaSlot('relentless');
   const ticker = (k: string) => [...h.ticker.map((w, i) => <span key={`${k}${i}`}>{w}</span>), <span key={`${k}r`}>{h.tickerRule[0]} <i>&gt;</i> {h.tickerRule[1]}</span>]
     .flatMap((el, i) => [el, <span key={`${k}g${i}`} className="gt">›</span>]);
 
   return (
     <>
-      <section className="hero"><div className="wrap hero-in">
+      <section className={withMedia('hero cine', heroMedia)}>{heroMedia && <Media slot={heroMedia} priority />}<div className="wrap hero-in">
         <div className="hero-copy">
           <span className="eyebrow">{h.eyebrow}</span>
           <h1 className="d-xxl">{h.h1a}{lang === 'es' ? ' ' : ' '}<span className="gt">&gt;</span> {h.h1b}</h1>
@@ -44,7 +50,7 @@ export default async function Home({ params }: PageProps) {
       </div></section>
       <div className="ticker" aria-hidden><div className="ticker-track">{ticker('a')}{ticker('b')}</div></div>
 
-      <section className="section wrap">
+      <section className="band"><div className="section wrap">
         <div className="sec-head"><div><span className="eyebrow">{h.goalEyebrow}</span><h2 className="d-l">{h.goalTitle}</h2></div>
           <Link className="btn-ghost btn" href={l('/shop')}>{h.shopAll} <span className="edge">›</span></Link></div>
         <div className="cats">
@@ -60,19 +66,27 @@ export default async function Home({ params }: PageProps) {
             );
           })}
         </div>
-      </section>
+      </div></section>
 
-      <section className="section-tight wrap" style={{ paddingTop: 0 }}>
+      <section className="section wrap">
         <div className="sec-head"><div><span className="eyebrow">{h.lineupEyebrow}</span><h2 className="d-l">{h.lineupTitle}</h2></div>
           <Link className="btn-ghost btn" href={l('/shop')}>{h.viewAll(PRODUCTS.length)} <span className="edge">›</span></Link></div>
         <div className="grid">{FEATURED.map(id => <ProductCard key={id} p={getProduct(id)!} lang={lang} />)}</div>
       </section>
 
-      <section className="band"><div className="wrap section" style={{ display: 'grid', gap: 28 }}>
-        <span className="eyebrow">{h.bandEyebrow}</span>
-        <h2 className="d-xl" style={{ maxWidth: '14ch' }}>{h.bandTitle}</h2>
-        <p className="lead" style={{ color: '#3A3936', maxWidth: '60ch' }}>{h.bandText}</p>
-        <div><Link className="btn btn-primary btn-l" href={l('/manifesto')} style={{ background: 'var(--void)', color: 'var(--bone)' }}>{h.readManifesto} <span className="edge">›</span></Link></div>
+      <section className={withMedia('cine reel', reelMedia)}>{reelMedia && <Media slot={reelMedia} />}<div className="wrap reel-in">
+        <span className="eyebrow">{h.reelEyebrow[0]} <span className="gt">›</span> {h.reelEyebrow[1]} <span className="gt">›</span> {h.reelEyebrow[2]}</span>
+        <h2 className="d-xl">{h.reelTitle}</h2>
+      </div></section>
+
+      <section className="band"><div className="wrap section band-split">
+        <div>
+          <span className="eyebrow">{h.bandEyebrow}</span>
+          <h2 className="d-xl" style={{ maxWidth: '14ch' }}>{h.bandTitle}</h2>
+          <p className="lead" style={{ maxWidth: '60ch' }}>{h.bandText}</p>
+          <div><Link className="btn btn-primary btn-l" href={l('/manifesto')} style={{ background: 'var(--void)', color: 'var(--bone)' }}>{h.readManifesto} <span className="edge">›</span></Link></div>
+        </div>
+        {portrait && <figure className="portrait has-media"><Media slot={portrait} /></figure>}
       </div></section>
 
       <section className="section wrap">
@@ -80,12 +94,12 @@ export default async function Home({ params }: PageProps) {
         <FuelPlanner lang={lang} />
       </section>
 
-      <section className="section wrap" style={{ paddingTop: 0 }}>
+      <section className="band"><div className="section wrap">
         <div className="sec-head"><div><span className="eyebrow">{h.stackEyebrow}</span><h2 className="d-l">{h.stackTitle}</h2></div></div>
         <div className="loop">{h.stack.map(([k, n, d]) => <div key={k}><span className="mono">{k}</span><span className="d-s">{n}</span><p>{d}</p></div>)}</div>
-      </section>
+      </div></section>
 
-      <section className="section-tight"><div className="wrap news">
+      <section className={withMedia('section-tight cine news-sec', relentless)}>{relentless && <Media slot={relentless} />}<div className="wrap news">
         <div style={{ display: 'grid', gap: 12 }}><span className="eyebrow">{h.newsEyebrow}</span><h2 className="d-l">{h.newsTitle}</h2><p className="lead">{h.newsLead}</p></div>
         <NewsForm lang={lang} />
       </div></section>

@@ -433,3 +433,38 @@ input[type=range] { width:100%; accent-color:var(--ignite); height:28px; }
 .hp { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
 #wlBtn[disabled] { opacity:.6; cursor:progress; }
 @media (max-width:860px) { .co.wl .co-side { order:2; margin-bottom:48px; } }
+
+/* bone sections: the same components, inverted. Black and bone alternate down the home page. */
+.band { --line:#D6D2C8; --line-strong:#8C8981; --muted:#57554F; --dim:#6B6862; --ignite-text:#B23A0C; }
+.band .cat, .band .loop div { background:var(--bone); }
+.band .cat:hover { background:#E8E5DD; }
+.band .lead { color:#3A3936; }
+.band .btn-ghost:hover { color:var(--void); }
+.band .btn-secondary { color:var(--void); }
+.band-split { display:flex; gap:clamp(32px,5vw,72px); align-items:center; }
+.band-split > div { flex:1; min-width:0; display:grid; gap:28px; }
+
+/* cinematic media: full-bleed stills and video loops behind a section (public/media, docs/media.md).
+   Sections only get .has-media when their file exists (lib/server/media.ts). No divider lines, with or without media. */
+.cine { position:relative; overflow:hidden; isolation:isolate; }
+.cine > .wrap { position:relative; z-index:1; }
+.media { position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; background:var(--void); }
+.media img, .media video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.7) contrast(1.06); }
+.media video { opacity:0; transition:opacity 1.2s ease; }
+.media.playing video { opacity:1; }
+.media::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,10,10,.2) 0%, rgba(10,10,10,.5) 55%, rgba(10,10,10,.9) 100%); }
+.cine.has-media .lead, .cine.has-media .eyebrow, .cine.has-media .hero-facts { color:#D6D3CC; }
+.hero > .media::after { background:linear-gradient(90deg, rgba(10,10,10,.85) 0%, rgba(10,10,10,.4) 60%, rgba(10,10,10,.1) 100%), linear-gradient(0deg, rgba(10,10,10,.9) 0%, rgba(10,10,10,0) 45%); }
+.hero.has-media .hero-in { grid-template-columns:1fr; align-items:end; min-height:clamp(560px, calc(100svh - 110px), 920px); }
+.hero.has-media .hero-art { display:none; }
+.hero.has-media .hero-copy { max-width:780px; }
+.reel-in { display:grid; gap:20px; justify-items:start; align-content:end; padding-block:clamp(72px,9vw,128px); }
+.reel.has-media .reel-in, .closer.has-media > .wrap { min-height:clamp(480px, 78vh, 820px); align-content:end; }
+.news-sec.has-media > .wrap { min-height:clamp(420px, 60vh, 640px); }
+.portrait { margin:0; position:relative; flex:0 0 38%; aspect-ratio:4/5; overflow:hidden; }
+.portrait .media { background:var(--bone); }
+.portrait .media::after { display:none; }
+@media (max-width:860px) {
+  .band-split { flex-direction:column; align-items:stretch; }
+  .portrait { flex-basis:auto; aspect-ratio:4/3; }
+}

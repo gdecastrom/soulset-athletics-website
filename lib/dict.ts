@@ -49,6 +49,7 @@ const en = {
     bandText: 'Your mind is the first thing you have to convince. Believe in your potential, act on it, earn the results, then start again.',
     plannerEyebrow: 'Fuel planner', plannerTitle: 'Know your numbers before race day',
     plannerLead: 'Tell us how long and how hard. We’ll work out carbs, sodium and fluid per hour, and build the basket.',
+    reelEyebrow: ['Believe', 'Act', 'Results'], reelTitle: 'The work no one sees',
     stackEyebrow: 'How the stack works', stackTitle: 'Fuel. Hydrate. Build. Ignite.',
     stack: [
       ['01 · DURING', 'Carb Gel 30', '30 g carbs and 200 mg sodium per gel. 2–3 an hour.'],
@@ -232,6 +233,7 @@ const es: Dict = {
     bandText: 'Tu mente es lo primero que tienes que convencer. Cree en tu potencial, actúa, gánate los resultados y vuelve a empezar.',
     plannerEyebrow: 'Planificador', plannerTitle: 'Conoce tus números antes de la carrera',
     plannerLead: 'Dinos cuánto dura y qué tan duro. Calculamos carbohidratos, sodio y líquido por hora, y armamos la canasta.',
+    reelEyebrow: ['Cree', 'Actúa', 'Resultados'], reelTitle: 'El trabajo que nadie ve',
     stackEyebrow: 'Cómo funciona el stack', stackTitle: 'Energía. Hidratación. Fuerza. Activación.',
     stack: [
       ['01 · DURANTE', 'Carb Gel 30', '30 g de carbohidratos y 200 mg de sodio por gel. 2–3 por hora.'],

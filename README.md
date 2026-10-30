@@ -52,6 +52,7 @@ select * from waitlist_pick_demand;   -- which variants people want most
 - **Interface copy** (headings, buttons, FAQ, manifesto): `lib/dict.ts`, English first, then Spanish. Spanish always addresses the visitor as *tú*. A test fails if the two languages don't have the same entries.
 - **Styles**: `app/globals.css` (design tokens at the top).
 - **Images**: `public/img/*.webp`, square 900×900 for products.
+- **Cinematic photos and video** (home hero, training band, manifesto portrait, waitlist and manifesto backgrounds): `public/media/`, names and specs in [docs/media.md](docs/media.md). Each slot appears only once its file is in the repo.
 
 ## Security
 
@@ -127,7 +128,7 @@ test/                   Catalogue, copy, planner and API tests (npm test)
 
 ## Brand system
 
-- **Colours:** Soulset Black `#0A0A0A`, Bone `#F2F0EB`, Ignite `#FF5A1F` (actions and the ">" only; text on Ignite is always black)
+- **Colours:** Soulset Black `#0A0A0A`, Bone `#F2F0EB`, Ignite `#FF5A1F` (actions and the ">" only; text on Ignite is always black). Home page sections alternate black and bone (`.band`); on bone, Ignite text darkens to `#B23A0C`
 - **Type:** Saira Extra Condensed 800/900 (display, uppercase), Barlow 400–600 (body), IBM Plex Mono (nutrition data)
 - **Mark:** SA level-up mark, a squared S with stacked chevrons (Believe → Act → Results)
 
@@ -138,6 +139,7 @@ test/                   Catalogue, copy, planner and API tests (npm test)
 - [ ] Real formulations and nutrition panels from the manufacturer
 - [ ] Final prices and currency (USD vs RD$)
 - [ ] Real product photography (current images are 3D renders)
+- [ ] Cinematic athlete footage for the home and manifesto pages (`docs/media.md` lists the files)
 - [ ] Legal pages (privacy policy, terms), and a privacy note on the waitlist form
 - [ ] Standard shipping fee below US$75 (needed for `SHIPPING_FEE_USD`)
 - [ ] When orders open: Azul or CardNet merchant account, then finish *Payments* above
