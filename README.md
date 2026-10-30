@@ -74,6 +74,7 @@ assets/js/app.js        Catalogue data, routing, cart, fuel planner, waitlist (E
 assets/js/app.es.js     Spanish copy of app.js
 assets/fonts/           Saira Extra Condensed, Barlow, IBM Plex Mono (subset woff2)
 assets/img/             Product renders (webp)
+assets/media/           Cinematic background photos and video loops (see the README there)
 assets/favicon.svg      Double-chevron mark
 ```
 
@@ -83,7 +84,7 @@ The product catalogue (names, options, prices, nutrition) lives in the `P` array
 
 ## Brand system
 
-- **Colours:** Soulset Black `#0A0A0A`, Bone `#F2F0EB`, Ignite `#FF5A1F` (actions and the ">" only; text on Ignite is always black)
+- **Colours:** Soulset Black `#0A0A0A`, Bone `#F2F0EB`, Ignite `#FF5A1F` (actions and the ">" only; text on Ignite is always black). Home page sections alternate black and bone (`.band`); on bone, Ignite text darkens to `#B23A0C`
 - **Type:** Saira Extra Condensed 800/900 (display, uppercase), Barlow 400–600 (body), IBM Plex Mono (nutrition data)
 - **Mark:** SA level-up mark, a squared S with stacked chevrons (Believe → Act → Results)
 
@@ -93,6 +94,7 @@ The product catalogue (names, options, prices, nutrition) lives in the `P` array
 - [ ] Real formulations and nutrition panels from the manufacturer
 - [ ] Final prices and currency (USD vs RD$)
 - [ ] Real product photography (current images are 3D renders)
+- [ ] Cinematic athlete footage for the home and manifesto pages (`assets/media/README.md` lists the files)
 - [ ] Legal pages (privacy policy, terms), and a privacy note on the waitlist form
 - [ ] When orders open: payment processor (e.g. Azul, CardNet or Stripe) and a real checkout
 

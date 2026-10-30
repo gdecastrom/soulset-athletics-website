@@ -212,12 +212,35 @@ function card(p) {
 }
 function bindCardAdds(root) { root.addEventListener('click', e => { const b = e.target.closest('[data-add]'); if (!b) return; const p = byId[b.dataset.add]; addToCart(p.id, defaults(p), 1, false, true); }); }
 
+/* ------------------------------------------------------------ cinematic media
+   Background photos and video loops from assets/media/ (see the README there). A slot stays hidden until its still
+   has loaded, so a missing file leaves the plain section. Video loads and plays only on screen, never with reduced motion. */
+const MEDIA = n => `../assets/media/${n}`;
+const media = (name, video) => `<div class="media" aria-hidden="true"><img class="media-still" src="${MEDIA(name + '.jpg')}" alt="" decoding="async">${video ? `<video class="media-vid" muted loop playsinline preload="none" data-src="${MEDIA(name + '.mp4')}"></video>` : ''}</div>`;
+let mediaObs;
+function bindMedia(root) {
+  if (mediaObs) mediaObs.disconnect();
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches || (navigator.connection && navigator.connection.saveData);
+  mediaObs = !still && 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
+    const v = e.target;
+    if (!e.isIntersecting) { v.pause(); return; }
+    if (!v.getAttribute('src')) v.src = v.dataset.src;
+    v.play().catch(() => {});
+  }), { rootMargin: '200px 0px' }) : null;
+  $$('.media', root).forEach(m => {
+    const img = $('.media-still', m), v = $('.media-vid', m);
+    const ok = () => { m.parentElement.classList.add('has-media'); if (v && mediaObs) { v.addEventListener('playing', () => m.classList.add('playing'), { once: true }); mediaObs.observe(v); } };
+    if (img.complete) { if (img.naturalWidth) ok(); else m.remove(); }
+    else { img.addEventListener('load', ok, { once: true }); img.addEventListener('error', () => m.remove(), { once: true }); }
+  });
+}
+
 /* ------------------------------------------------------------ inicio */
 function viewHome() {
   const cats = [['fuel', 'Energía', 'Geles de carbohidratos y mezcla de carbos + sodio', '01', 'gel-citrus'], ['hydrate', 'Hidratación', 'Sodio, dosificado según tu sudor', '02', 'na-1000'], ['build', 'Fuerza', 'Creatina monohidratada', '03', 'cre-300'], ['ignite', 'Activación', 'Pre-entreno', '04', 'pre-mango']];
   const featured = ['carb-gel-30', 'fuel-mix-60', 'sodium', 'carb-gel-30-caffeine', 'pre-workout', 'creatine'];
   return `
-  <section class="hero"><div class="wrap hero-in">
+  <section class="hero cine">${media('hero', true)}<div class="wrap hero-in">
     <div class="hero-copy">
       <span class="eyebrow">Soulset Athletics · Nutrición deportiva</span>
       <h1 class="d-xxl">Mentalidad&nbsp;<span class="gt">&gt;</span> todo</h1>
@@ -229,21 +252,28 @@ function viewHome() {
   </div></section>
   <div class="ticker" aria-hidden="true"><div class="ticker-track">${Array(2).fill('<span>Cree</span><span class="gt">›</span><span>Actúa</span><span class="gt">›</span><span>Resultados</span><span class="gt">›</span><span>Cree</span><span class="gt">›</span><span>Sin descanso</span><span class="gt">›</span><span>Mentalidad <i>&gt;</i> todo</span><span class="gt">›</span>').join('')}</div></div>
 
-  <section class="section wrap">
+  <section class="band"><div class="section wrap">
     <div class="sec-head"><div><span class="eyebrow">Compra por objetivo</span><h2 class="d-l">Prepárate para ganar</h2></div><a class="btn-ghost btn" href="#shop">Ver todo <span class="edge">›</span></a></div>
     <div class="cats">${cats.map(([k, n, d, num, im]) => `<a class="cat" href="#shop-${k}"><img class="cat-img" src="${IMG(im)}" alt="" loading="lazy"><span class="num">${num}</span><div style="display:grid;gap:8px"><span class="d-m">${n}</span><p>${d}</p></div><span class="go">Ver ${n.toLowerCase()} ›</span></a>`).join('')}</div>
-  </section>
+  </div></section>
 
-  <section class="section-tight wrap" style="padding-top:0">
+  <section class="section wrap">
     <div class="sec-head"><div><span class="eyebrow">La línea</span><h2 class="d-l">Tu pasión, nuestro combustible</h2></div><a class="btn-ghost btn" href="#shop">Ver los 8 <span class="edge">›</span></a></div>
     <div class="grid" id="homeGrid">${featured.map(id => card(byId[id])).join('')}</div>
   </section>
 
-  <section class="band"><div class="wrap section" style="display:grid;gap:28px">
+  <section class="cine reel">${media('training', true)}<div class="wrap reel-in">
+    <span class="eyebrow">Cree <span class="gt">›</span> Actúa <span class="gt">›</span> Resultados</span>
+    <h2 class="d-xl">El trabajo que nadie ve</h2>
+  </div></section>
+
+  <section class="band"><div class="wrap section band-split"><div>
     <span class="eyebrow">Nuestro manifiesto</span>
     <h2 class="d-xl" style="max-width:14ch">Ponle toda el alma</h2>
     <p class="lead" style="color:#3A3936;max-width:60ch">Tu mente es lo primero que tienes que convencer. Soulset es un recordatorio constante de dejar de desear y empezar a hacer: cree en tu potencial, actúa, gánate los resultados y vuelve a creer.</p>
     <div><a class="btn btn-primary btn-l" href="#manifesto" style="background:var(--void);color:var(--bone)">Lee el manifiesto <span class="edge">›</span></a></div>
+  </div>
+    <figure class="portrait">${media('portrait')}</figure>
   </div></section>
 
   <section class="section wrap">
@@ -251,7 +281,7 @@ function viewHome() {
     ${plannerHTML()}
   </section>
 
-  <section class="section wrap" style="padding-top:0">
+  <section class="band"><div class="section wrap">
     <div class="sec-head"><div><span class="eyebrow">Cómo funciona el stack</span><h2 class="d-l">Energía. Hidratación. Fuerza. Activación.</h2></div></div>
     <div class="loop">
       <div><span class="mono">01 · DURANTE</span><span class="d-s">Carb Gel 30</span><p>30 g de carbohidratos y 200 mg de sodio por gel. 2–3 por hora.</p></div>
@@ -260,9 +290,9 @@ function viewHome() {
       <div><span class="mono">04 · CADA DÍA</span><span class="d-s">Creatine</span><p>5 g. Un ingrediente. La constancia gana.</p></div>
       <div><span class="mono">05 · ANTES</span><span class="d-s">Pre-Workout</span><p>Cafeína, beta-alanina, citrulina. Enciéndete.</p></div>
     </div>
-  </section>
+  </div></section>
 
-  <section class="section-tight" style="border-top:1px solid var(--line)"><div class="wrap news">
+  <section class="section-tight cine news-sec">${media('relentless')}<div class="wrap news">
     <div style="display:grid;gap:12px"><span class="eyebrow">Únete a la lista de espera</span><h2 class="d-l">Sin descanso</h2><p class="lead">Entérate primero cuando Soulset se lance y recibe 10% de descuento en tu primer pedido.</p></div>
     <div><form id="newsForm" novalidate><label class="sr" for="newsEmail">Correo electrónico</label><input id="newsEmail" type="email" placeholder="tu@correo.com" autocomplete="email" required><button class="btn btn-primary" type="submit">Únete a la lista</button></form><p class="news-msg" id="newsMsg"></p></div>
   </div></section>`;
@@ -491,13 +521,13 @@ function viewManifesto() {
       <div style="display:grid;gap:24px"><div style="display:grid;gap:12px"><span class="eyebrow">La marca</span><h2 class="d-l">Sube de nivel, tres veces</h2><p class="lead">Nuestra S se inclina hacia adelante. Nuestra A está hecha de tres chevrones ascendentes, uno por cada paso del ciclo. Juntas se leen SA: Soulset Athletics.</p></div>
         <ol><li><span class="mono">01</span><div><b>Cree</b><p>El primer chevrón. Convence a tu mente.</p></div></li><li><span class="mono">02</span><div><b>Actúa</b><p>El segundo. Haz el trabajo, sobre todo cuando no tienes ganas.</p></div></li><li><span class="mono">03</span><div><b>Resultados</b><p>El tercero. Ganados, y usados para volver a creer.</p></div></li></ol></div>
     </section>
+  </div>
 
-    <section class="section" style="padding-top:0;display:grid;gap:28px;justify-items:start;border-top:1px solid var(--line);padding-top:clamp(72px,9vw,128px)">
-      <h2 class="d-xxl">Sin descanso</h2>
-      <p class="lead">Prepárate para el éxito con las mejores herramientas posibles. Después, ponle toda el alma.</p>
-      <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Ver los productos <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#fuel-planner">Arma tu plan</a></div>
-    </section>
-  </div>`;
+  <section class="cine closer">${media('relentless')}<div class="wrap section" style="display:grid;gap:28px;justify-items:start">
+    <h2 class="d-xxl">Sin descanso</h2>
+    <p class="lead">Prepárate para el éxito con las mejores herramientas posibles. Después, ponle toda el alma.</p>
+    <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Ver los productos <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#fuel-planner">Arma tu plan</a></div>
+  </div></section>`;
 }
 
 /* ------------------------------------------------------------ ayuda */
@@ -622,7 +652,7 @@ function render() {
   else if (h === 'waitlist' || h === 'checkout') { html = viewWaitlist(); bind = bindWaitlist; title = 'Únete a la lista de espera'; nav = 'waitlist'; }
   else if (h === 'waitlist-confirmed' || h === 'order-confirmed') { const done = !!store.get('waitlist', null); html = viewWaitlistDone(); bind = done ? () => {} : bindWaitlist; title = done ? 'Ya estás en la lista' : 'Únete a la lista de espera'; nav = 'waitlist'; }
   else { html = `<div class="wrap conf"><h1 class="d-xl">Página no encontrada</h1><p class="lead">Esa página no existe. Tu próxima sesión sí.</p><div><a class="btn btn-primary btn-l" href="#shop">Ver todo</a></div></div>`; title = 'No encontrada'; }
-  view.innerHTML = html; bind(view); setTitle(title);
+  view.innerHTML = html; bind(view); bindMedia(view); setTitle(title);
   $$('.nav a').forEach(a => a.toggleAttribute('aria-current', false));
   $$('.nav a').forEach(a => { if (a.dataset.nav === nav) a.setAttribute('aria-current', 'page'); });
   $('#shopBtn').classList.toggle('is-current', nav.startsWith('shop'));
