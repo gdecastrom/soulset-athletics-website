@@ -67,6 +67,20 @@ p { margin:0; }
 .nav { display:flex; gap:28px; margin-left:12px; }
 .nav a { text-decoration:none; font-weight:600; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); padding:8px 0; border-bottom:2px solid transparent; }
 .nav a:hover, .nav a[aria-current="page"] { color:var(--bone); border-color:var(--ignite); }
+.nav { align-items:center; }
+.nav-drop { position:relative; }
+.nav-btn { background:none; border:0; border-bottom:2px solid transparent; cursor:pointer; display:inline-flex; align-items:center; gap:7px; font:inherit; font-weight:600; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); padding:8px 0; }
+.nav-btn .caret { width:10px; height:6px; transition:transform .15s; }
+.nav-btn:hover, .nav-btn.is-current, .nav-drop.open .nav-btn { color:var(--bone); border-color:var(--ignite); }
+.drop { display:none; position:absolute; top:calc(100% + 15px); left:-16px; min-width:280px; padding:6px; background:var(--raised); border:1px solid var(--line); box-shadow:0 18px 40px rgba(0,0,0,.5); }
+.drop::before { content:""; position:absolute; left:0; right:0; top:-16px; height:16px; }
+.nav-drop.open .drop { display:block; }
+@media (hover:hover) { .nav-drop:not(.shut):hover .drop { display:block; } .nav-drop:not(.shut):hover .caret { transform:rotate(180deg); } }
+.nav-drop.open .caret { transform:rotate(180deg); }
+.nav .drop a { display:flex; justify-content:space-between; align-items:baseline; gap:20px; padding:12px 12px 12px 10px; border-bottom:0; border-left:2px solid transparent; color:var(--bone); }
+.nav .drop a span { font-weight:400; font-size:13px; letter-spacing:0; text-transform:none; color:var(--dim); }
+.nav .drop a:hover { background:var(--raised-2); }
+.nav .drop a[aria-current="page"] { border-left-color:var(--ignite); background:var(--raised-2); }
 .head-actions { margin-left:auto; display:flex; align-items:center; gap:8px; }
 .icon-btn { background:none; border:0; min-width:44px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; color:var(--bone); padding:0 8px; }
 .icon-btn svg { width:22px; height:22px; }

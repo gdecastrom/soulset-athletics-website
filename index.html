@@ -26,10 +26,17 @@
   <div class="wrap head-in">
     <a class="brand" href="#home" aria-label="Soulset Athletics home"><svg class="logo-svg" viewBox="0 -4 795.54 104" role="img" aria-label="Soulset Athletics horizontal lockup"><g transform="matrix(1 0 -0.22 1 22 0)"><path d="M76 11 L11 11 L11 50 L65 50 L65 89 L0 89" fill="none" stroke="currentColor" stroke-width="22" stroke-linejoin="miter" stroke-miterlimit="4"/><path d="M90 30 L138 -4 L186 30 L186 44 L138 10 L90 44 Z M90 58 L138 24 L186 58 L186 72 L138 38 L90 72 Z M90 86 L138 52 L186 86 L186 100 L138 66 L90 100 Z" fill="currentColor"/></g><g transform="translate(234 8.14)"><path d="M57.5 3.9 L3.9 3.9 L3.9 23.0 L53.6 23.0 L53.6 42.1 L0.0 42.1 M89.9 3.9 L139.6 3.9 L139.6 42.1 L89.9 42.1 L89.9 3.9 L139.6 3.9 M175.9 0.0 L175.9 42.1 L225.6 42.1 L225.6 0.0 M262.0 0.0 L262.0 42.1 L306.9 42.1 M393.0 3.9 L339.4 3.9 L339.4 23.0 L389.0 23.0 L389.0 42.1 L335.5 42.1 M479.0 3.9 L425.4 3.9 L425.4 42.1 L479.0 42.1 M425.4 23.0 L476.2 23.0 M507.5 3.9 L561.5 3.9 M534.5 3.9 L534.5 46.0" fill="none" stroke="currentColor" stroke-width="7.82" stroke-linejoin="miter"/><g transform="translate(0 60.7)"><path d="M2.2 23.0 L2.2 2.2 L31.1 2.2 L31.1 23.0 M2.2 11.5 L31.1 11.5 M70.8 2.2 L102.1 2.2 M86.4 2.2 L86.4 23.0 M141.8 0.0 L141.8 23.0 M170.6 0.0 L170.6 23.0 M141.8 11.5 L170.6 11.5 M212.5 0.0 L212.5 20.8 L238.6 20.8 M309.4 2.2 L278.3 2.2 L278.3 20.8 L309.4 20.8 M278.3 11.5 L307.8 11.5 M346.8 2.2 L378.1 2.2 M362.5 2.2 L362.5 23.0 M417.8 0.0 L417.8 23.0 M490.8 2.2 L459.7 2.2 L459.7 20.8 L490.8 20.8 M561.5 2.2 L530.4 2.2 L530.4 11.5 L559.3 11.5 L559.3 20.8 L528.2 20.8" fill="none" stroke="currentColor" stroke-width="4.50" stroke-linejoin="miter"/></g></g></svg></a>
     <nav class="nav" aria-label="Main">
-      <a href="#shop" data-nav="shop">Shop</a>
-      <a href="#shop-fuel" data-nav="shop-fuel">Fuel</a>
-      <a href="#shop-hydrate" data-nav="shop-hydrate">Hydrate</a>
-      <a href="#shop-build" data-nav="shop-build">Build</a>
+      <div class="nav-drop" id="shopDrop">
+        <button class="nav-btn" id="shopBtn" type="button" aria-expanded="false" aria-controls="shopMenu">Shop<svg class="caret" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <div class="drop" id="shopMenu">
+          <a href="#shop" data-nav="shop">All products<span>Everything</span></a>
+          <a href="#shop-fuel" data-nav="shop-fuel">Fuel<span>Carb gels &amp; Fuel Mix</span></a>
+          <a href="#shop-hydrate" data-nav="shop-hydrate">Hydrate<span>Sodium</span></a>
+          <a href="#shop-build" data-nav="shop-build">Build<span>Creatine</span></a>
+          <a href="#shop-ignite" data-nav="shop-ignite">Ignite<span>Pre-workout</span></a>
+          <a href="#shop-stacks" data-nav="shop-stacks">Stacks<span>Bundles</span></a>
+        </div>
+      </div>
       <a href="#fuel-planner" data-nav="fuel-planner">Fuel planner</a>
       <a href="#manifesto" data-nav="manifesto">Manifesto</a>
       <a href="#waitlist" data-nav="waitlist">Waitlist</a>
@@ -46,7 +53,7 @@
     </div>
   </div>
   <nav class="mnav wrap" id="mnav" aria-label="Mobile">
-    <a href="#shop">Shop all</a><a href="#shop-fuel">Fuel</a><a href="#shop-hydrate">Hydrate</a><a href="#shop-build">Build</a><a href="#shop-ignite">Ignite</a><a href="#fuel-planner">Fuel planner</a><a href="#manifesto">Manifesto</a><a href="#waitlist">Join the waitlist</a>
+    <a href="#shop">Shop all</a><a href="#shop-fuel">Fuel</a><a href="#shop-hydrate">Hydrate</a><a href="#shop-build">Build</a><a href="#shop-ignite">Ignite</a><a href="#shop-stacks">Stacks</a><a href="#fuel-planner">Fuel planner</a><a href="#manifesto">Manifesto</a><a href="#waitlist">Join the waitlist</a>
   </nav>
 </header>
 
