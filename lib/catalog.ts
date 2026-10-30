@@ -64,8 +64,19 @@ export function optionsLabel(p: Product, opts: Opts, lang: Lang) {
 }
 export const subPrice = (unit: number) => Math.round(unit * (1 - SUB_OFF) * 100) / 100;
 
+/* Stock-keeping unit of a choice of options: product code plus the option value ids, e.g. GEL-030-CITRUS-BOX-OF-12.
+   The database identifies variants by it (variant.sku), so it must never change for an existing choice. */
+export function variantSku(p: Product, opts: Opts) {
+  return [p.code, ...p.options.map(op => opts[op.key])].join('-').toUpperCase();
+}
+
+/* Every variant of a product: one value for each option. */
+export function allVariants(p: Product): Opts[] {
+  return p.options.reduce<Opts[]>((acc, op) => acc.flatMap(o => op.values.map(v => ({ ...o, [op.key]: v.id }))), [{}]);
+}
+
 /* ------------------------------------------------------------ server-side pricing (checkout) */
-export type PricedLine = { productId: string; name: string; options: string; qty: number; subscribe: boolean; unitCents: number; totalCents: number };
+export type PricedLine = { productId: string; sku: string; name: string; options: string; qty: number; subscribe: boolean; listCents: number; unitCents: number; totalCents: number };
 
 /* Prices one cart line exactly as the site stores it. Returns null if anything doesn't match the catalogue. */
 export function priceLine(line: unknown): PricedLine | null {
@@ -79,8 +90,9 @@ export function priceLine(line: unknown): PricedLine | null {
   const unit = unitPrice(p, l.opts);
   if (unit == null) return null;
   const subscribe = l.sub === true && p.sub;
-  const unitCents = Math.round((subscribe ? unit * (1 - SUB_OFF) : unit) * 100);
-  return { productId: p.id, name: p.name, options: optionsLabel(p, l.opts, 'en'), qty, subscribe, unitCents, totalCents: unitCents * qty };
+  const listCents = Math.round(unit * 100);
+  const unitCents = subscribe ? Math.round(listCents * (1 - SUB_OFF)) : listCents;
+  return { productId: p.id, sku: variantSku(p, l.opts), name: p.name, options: optionsLabel(p, l.opts, 'en'), qty, subscribe, listCents, unitCents, totalCents: unitCents * qty };
 }
 
 export function priceCart(lines: unknown, { shippingCents }: { shippingCents: number }) {

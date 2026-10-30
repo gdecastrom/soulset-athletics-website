@@ -31,19 +31,22 @@ Orders aren't open yet. Visitors browse the line-up, use the Fuel Planner and bu
 The waitlist form and the home page box `POST` to `/api/waitlist` (`app/api/waitlist/route.ts`), which:
 
 1. validates everything again on the server (email, known province, known products, size limits), refuses cross-site requests and rate-limits each IP to 5 requests per 10 minutes;
-2. saves the sign-up in `waitlist_signups`. Signing up again with the same email updates the row instead of creating a duplicate;
+2. saves it as a `customer`, a `waitlist_signup` and the cart as `waitlist_pick` rows (one per product variant). Signing up again with the same email updates the same rows instead of creating duplicates;
 3. emails a confirmation in the visitor's language through Resend, with an unsubscribe link (`/api/unsubscribe`, signed so nobody can unsubscribe someone else), and optionally a short notice to the team (`NOTIFY_EMAIL`).
 
 If email isn't configured yet, sign-ups are still saved. Useful queries (Neon SQL editor):
 
 ```sql
-select email, first_name, province, site_language, created_at from waitlist_signups where unsubscribed_at is null order by created_at desc;
-select * from waitlist_pick_demand;   -- which products people want most
+select c.email, c.first_name, p.name as province, s.site_language, s.created_at
+from waitlist_signup s join customer c on c.id = s.customer_id left join province p on p.id = c.province_id
+where s.unsubscribed_at is null order by s.created_at desc;
+
+select * from waitlist_pick_demand;   -- which variants people want most
 ```
 
 ## Editing content
 
-- **Products** (names, options, prices, nutrition, copy in both languages): `lib/catalog-data.ts`. This is the only copy: the pages and the checkout both read it.
+- **Products** (names, options, prices, nutrition, copy in both languages): `lib/catalog-data.ts`. The pages read it, and every deploy copies products, variants and prices into the database (price changes are kept as history). Never change an existing option value id: it's part of the SKU.
 - **Interface copy** (headings, buttons, FAQ, manifesto): `lib/dict.ts`, English first, then Spanish. Spanish always addresses the visitor as *tú*. A test fails if the two languages don't have the same entries.
 - **Styles**: `app/globals.css` (design tokens at the top).
 - **Images**: `public/img/*.webp`, square 900×900 for products.
@@ -52,8 +55,8 @@ select * from waitlist_pick_demand;   -- which products people want most
 
 - **No way to edit orders from the internet.** The only order endpoints are `/api/checkout`, which can only *create* a pending order, and `/api/payment-callback`, which only accepts results it can verify with the payment provider. Nothing reads or updates an order by id from the browser, and the order page never reads the database.
 - **Prices come from the server.** Totals are computed from `lib/catalog-data.ts`; whatever price the browser sends is ignored.
-- **The database enforces it too.** Triggers in `db/schema.sql` refuse any change to an order's items, amounts, customer or email after it's created, allow status changes only forward (`pending` → `paid` / `declined` / `cancelled` / `error`, `paid` → `refunded`), and refuse deletes. Payment events are append-only. This holds even with a bug in the app.
-- **Least-privilege database login.** `db/app-role.sql` creates `soulset_app`, which can add rows and update only the columns the site needs: no deletes, no schema changes, can't disable the triggers. The site uses that role; the owner login is only for migrations and for the team in the Neon console.
+- **The database enforces it too.** Triggers refuse any change to an order's amounts, customer or delivery details after it's created, allow status changes only forward (`pending` → `paid` / `declined` / `cancelled` / `error`, `paid` → `refunded`), check that an order's subtotal matches its items, and refuse deletes. Order items, payment events and prices are append-only. This holds even with a bug in the app.
+- **Least-privilege database login.** The migrations create `soulset_app`, which can add rows and update only the columns the site needs: no deletes (except a wishlist's picks), no schema changes, can't disable the triggers. The site uses that role; the owner login is only for deploys and for the team in the Neon console.
 - **Headers.** A strict Content Security Policy (own scripts, styles, fonts and images only), HSTS, `X-Frame-Options: DENY`, `nosniff`, and no indexing of `/api` or preview deployments.
 - **Card data never touches the site**: Azul and CardNet both offer hosted payment pages.
 
@@ -61,8 +64,8 @@ select * from waitlist_pick_demand;   -- which products people want most
 
 ```bash
 npm install
-DATABASE_URL=postgres://… npm run db:migrate
-DATABASE_URL=postgres://… APP_SECRET=dev npm run dev   # http://localhost:3000
+MIGRATION_DATABASE_URL=postgres://… npm run db:release   # migrations + catalogue sync, as the owner
+DATABASE_URL=postgres://… APP_SECRET=dev npm run dev     # http://localhost:3000
 ```
 
 Checks:
@@ -70,7 +73,7 @@ Checks:
 ```bash
 npm run typecheck
 npm run build
-TEST_DATABASE_URL=postgres://… npm test   # empties that database's tables: use a throwaway one
+TEST_DATABASE_URL=postgres://… npm test   # drops and rebuilds that database's schema: use a throwaway one
 ```
 
 `npm test` runs the catalogue, copy and planner checks, plus the API tests against a real Postgres when `TEST_DATABASE_URL` is set. To prove the restricted role is enough, set `TEST_ADMIN_DATABASE_URL` to the owner and `TEST_DATABASE_URL` to `soulset_app`. Tests need Node 22.18 or newer.
@@ -78,16 +81,16 @@ TEST_DATABASE_URL=postgres://… npm test   # empties that database's tables: us
 ## Deploy on Vercel
 
 1. **Project.** Import the GitHub repository in Vercel (framework: Next.js, defaults are fine).
-2. **Database.** In the project, *Storage* → *Create database* → **Neon**. It adds `DATABASE_URL` (the owner login).
-   1. From your machine, create the tables with that URL: `DATABASE_URL=… npm run db:migrate` (safe to re-run after schema changes).
-   2. In the Neon SQL editor, run `db/app-role.sql` with a strong password in place of `CHANGE-ME`.
-   3. In Vercel, replace `DATABASE_URL` with the `soulset_app` connection string (same host, use the `-pooler` host if Neon offers it).
-   4. Give preview deployments their own Neon branch (the Neon integration can do this) so tests on previews never touch real sign-ups or orders.
+2. **Database.** Create a Neon project (or *Storage* → *Create database* → **Neon** in Vercel).
+   1. Set `MIGRATION_DATABASE_URL` to the owner's connection string. Every build runs `scripts/release.ts` first: pending migrations, then the catalogue sync.
+   2. After the first deploy, give the site's login a password once, in the Neon SQL editor: `alter role soulset_app login password '…';`
+   3. Set `DATABASE_URL` to the `soulset_app` connection string (use the `-pooler` host).
+   4. Give preview deployments their own Neon branch so tests on previews never touch real sign-ups or orders.
 3. **Secret.** Add `APP_SECRET` (`openssl rand -base64 32`). Don't change it later: it signs the unsubscribe links already sent.
 4. **Resend.** Verify the domain in Resend (DNS records at your registrar), create an API key, then set `RESEND_API_KEY`, `EMAIL_FROM` (e.g. `Soulset Athletics <hola@soulsetathletics.com>`), and optionally `EMAIL_REPLY_TO` and `NOTIFY_EMAIL`.
 5. **Domain.** Add the custom domain in Vercel → *Domains* and set `SITE_URL` to it, so canonical links, the sitemap, social previews and email links use it.
 
-The code is plain Postgres: moving to Railway later means pointing `DATABASE_URL` there and running the migration and `db/app-role.sql`. All variables are listed in `.env.example`.
+The code is plain Postgres: moving to Railway later means pointing both URLs there and redeploying. The design, business rules and ERD are in [docs/database.md](docs/database.md), the column-by-column dictionary in [docs/data-dictionary.md](docs/data-dictionary.md). All variables are listed in `.env.example`.
 
 ## Payments (ready for launch, off for now)
 
@@ -112,8 +115,10 @@ lib/catalog.ts          Product types, prices, server-side cart pricing
 lib/dict.ts             Interface copy in both languages
 lib/planner.ts          Fuel planner maths
 lib/server/             Database, validation, emails, rate limiting, payment providers (server only)
-db/schema.sql           Tables, views and order-protection triggers (npm run db:migrate)
-db/app-role.sql         Least-privilege login for the site
+db/migrations/          Numbered SQL migrations (never edited once applied)
+docs/database.md        Database design: rules, entities, ERD, history
+docs/data-dictionary.md Every table and column, generated from the schema
+scripts/release.ts      Runs before each build: migrations + catalogue sync
 proxy.ts                English / Spanish routing
 test/                   Catalogue, copy, planner and API tests (npm test)
 ```

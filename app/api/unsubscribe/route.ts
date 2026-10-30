@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   const sql = db();
   if (!sql) return page(503, `<h1>Try again later</h1><p>Inténtalo más tarde.</p>`);
   try {
-    await sql`update waitlist_signups set unsubscribed_at = coalesce(unsubscribed_at, now()), updated_at = now() where id = ${id}`;
+    await sql`update waitlist_signup set unsubscribed_at = coalesce(unsubscribed_at, now()) where id = ${id}`;
   } catch (err) {
     console.error('[unsubscribe] database error', (err as Error).message);
     return page(500, `<h1>Try again later</h1><p>Something went wrong on our side. · Algo falló de nuestro lado.</p>`);

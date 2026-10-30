@@ -23,20 +23,20 @@ async function handle(request: Request) {
   } catch (err) {
     console.error('[payment-callback] could not verify', (err as Error).message);
     const payload = Object.fromEntries(new URL(request.url).searchParams);
-    await sql`insert into payment_events (provider, status, verified, payload) values (${provider.name}, 'unverified', false, ${sql.json(payload)})`.catch(() => {});
+    await sql`insert into payment_event (payment_provider, status, verified, payload) values (${provider.name}, 'unverified', false, ${sql.json(payload)})`.catch(() => {});
     return back(request, 'en', 'error');
   }
 
   try {
-    await sql`insert into payment_events (order_id, provider, status, verified, payload)
+    await sql`insert into payment_event (sales_order_id, payment_provider, status, verified, payload)
               values (${result.orderId}, ${provider.name}, ${result.status}, true, ${sql.json(JSON.parse(JSON.stringify(result.payload || {})))})`;
     /* Only a pending order changes, so a repeated or late callback can't turn a paid order into a declined one.
-       The database enforces the same rule (orders_guard trigger in db/schema.sql). */
+       The database enforces the same rule (sales_order_guard in db/migrations/0001_initial.sql). */
     await sql`
-      update orders set status = ${result.status}, provider_reference = ${result.reference || null},
-             paid_at = case when ${result.status} = 'paid' then now() else paid_at end, updated_at = now()
-      where id = ${result.orderId} and status = 'pending' and provider = ${provider.name}`;
-    const [order] = await sql<{ number: string; status: string; site_language: Lang }[]>`select number, status, site_language from orders where id = ${result.orderId}`;
+      update sales_order set status = ${result.status}, provider_reference = ${result.reference || null},
+             paid_at = case when ${result.status} = 'paid' then now() else paid_at end
+      where id = ${result.orderId} and status = 'pending' and payment_provider = ${provider.name}`;
+    const [order] = await sql<{ number: string; status: string; site_language: Lang }[]>`select order_number as number, status, site_language from sales_order where id = ${result.orderId}`;
     if (!order) return back(request, 'en', 'error');
     return back(request, order.site_language, order.status === 'pending' ? 'error' : order.status, order.number);
   } catch (err) {
