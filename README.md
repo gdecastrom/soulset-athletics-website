@@ -9,7 +9,7 @@ It's a static, dependency-free single-page site (HTML, CSS and vanilla JavaScrip
 Orders aren't open yet, so there is no checkout or payment flow. Visitors can still browse the line-up, use the Fuel Planner and build a cart, which works as a wishlist. Every purchase path leads to the waitlist:
 
 - **Cart drawer** → "Join the waitlist" (`#waitlist`)
-- **Waitlist page** (`#waitlist`): email (required), first name (optional), country, plus the cart contents as "your picks"
+- **Waitlist page** (`#waitlist`): email (required), first name (optional), Dominican province (optional), plus the cart contents as "your picks"
 - **Confirmation** (`#waitlist-confirmed`)
 - **Home page sign-up** posts to the same waitlist
 - Old links to `#checkout` and `#order-confirmed` redirect to the waitlist
@@ -30,7 +30,7 @@ Payload sent for each sign-up:
 {
   "email": "athlete@email.com",
   "firstName": "Gabo",
-  "country": "DO",
+  "province": "Santiago",
   "picks": [{ "id": "sodium", "name": "Sodium", "options": "1000 mg", "qty": 1, "subscribe": false }],
   "picksSummary": "1 × Sodium (1000 mg)",
   "source": "waitlist-page",
@@ -40,7 +40,7 @@ Payload sent for each sign-up:
 }
 ```
 
-`source` is `waitlist-page` or `home`. `siteLanguage` is `en` or `es`, depending on which version of the site the visitor used. `picks` tells you which products people want most before launch. A hidden honeypot field filters out simple bots.
+`source` is `waitlist-page` or `home`. `province` is one of the 31 provinces or Distrito Nacional, or empty if the visitor didn't choose (and always empty from the home sign-up). `siteLanguage` is `en` or `es`, depending on which version of the site the visitor used. `picks` tells you which products people want most before launch. A hidden honeypot field filters out simple bots.
 
 ## Spanish site
 
