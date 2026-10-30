@@ -435,3 +435,53 @@ input[type=range] { width:100%; accent-color:var(--ignite); height:28px; }
 .hp { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
 #wlBtn[disabled] { opacity:.6; cursor:progress; }
 @media (max-width:860px) { .co.wl .co-side { order:2; margin-bottom:48px; } }
+
+/* cinematic athlete footage: full-bleed video behind copy, graded dark so bone type and Ignite stay legible.
+   Videos load only near the viewport and pause off-screen; reduced motion and Save-Data get the still poster. */
+.cine { position:relative; overflow:hidden; isolation:isolate; background:var(--void); border-bottom:1px solid var(--line); }
+.cine-media { position:absolute; inset:0; z-index:-2; }
+.cine-media img, .cine-media video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:var(--pos,50% 50%); filter:saturate(.8) contrast(1.06); }
+.cine-media video { opacity:0; transition:opacity .9s ease; }
+.cine-media video.on { opacity:1; }
+.cine::before { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:linear-gradient(90deg,rgba(10,10,10,.82) 0%,rgba(10,10,10,.45) 48%,rgba(10,10,10,.12) 100%),
+             linear-gradient(0deg,rgba(10,10,10,.9) 0%,rgba(10,10,10,0) 45%),
+             radial-gradient(120% 90% at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%); }
+.cine::after { content:""; position:absolute; inset:-50%; z-index:-1; pointer-events:none; opacity:.09; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.2s steps(6) infinite; }
+@keyframes grain { 0%{transform:translate(0,0)} 20%{transform:translate(-4%,3%)} 40%{transform:translate(3%,-5%)} 60%{transform:translate(-6%,-2%)} 80%{transform:translate(5%,4%)} 100%{transform:translate(0,0)} }
+.cine-in { position:relative; display:grid; gap:24px; align-content:end; min-height:var(--h,clamp(520px,82vh,860px)); padding-block:clamp(56px,8vw,112px); }
+.cine-in > * { max-width:min(100%,920px); }
+.cine .lead { color:#D6D3CC; text-shadow:0 1px 18px rgba(0,0,0,.6); }
+.cine .eyebrow { color:#C9C6BF; }
+.cine .hero-facts { color:#C9C6BF; }
+.cine .btn-secondary { border-color:rgba(242,240,235,.6); background:rgba(10,10,10,.25); backdrop-filter:blur(4px); }
+.cine-hero { --h:clamp(560px,calc(100svh - 100px),920px); }
+.cine-center::before { background:radial-gradient(90% 80% at 50% 55%,rgba(10,10,10,.35) 0%,rgba(10,10,10,.82) 100%); }
+.cine-center .cine-in { align-content:center; justify-items:center; text-align:center; }
+.cine-center .lead { margin-inline:auto; }
+
+.cine .news input[type=email] { background:rgba(10,10,10,.7); }
+
+/* black-and-white grade for the home page: monochrome film, lifted blacks, a lighter wash than the colour sections */
+.cine-bw .cine-media img, .cine-bw .cine-media video { filter:grayscale(1) contrast(1.12) brightness(1.05); }
+.cine-bw::before { background:linear-gradient(90deg,rgba(10,10,10,.62) 0%,rgba(10,10,10,.28) 50%,rgba(10,10,10,0) 100%),
+                   linear-gradient(0deg,rgba(10,10,10,.75) 0%,rgba(10,10,10,0) 50%); }
+
+@media (max-width:860px) {
+  .cine::before { background:linear-gradient(0deg,rgba(10,10,10,.95) 0%,rgba(10,10,10,.55) 55%,rgba(10,10,10,.3) 100%); }
+}
+@media (prefers-reduced-motion:reduce) { .cine::after { display:none; } }
+
+/* mirrored still, so the athlete runs on the right and the copy keeps the left */
+.cine-flip .cine-media img { transform:scaleX(-1); }
+
+/* full-colour grade: the footage as shot, with only enough shade behind the copy to keep it legible */
+.cine-color .cine-media img, .cine-color .cine-media video { filter:saturate(1.08) contrast(1.04); }
+.cine-color::before { background:linear-gradient(90deg,rgba(10,10,10,.6) 0%,rgba(10,10,10,.2) 55%,rgba(10,10,10,0) 100%),
+                      linear-gradient(0deg,rgba(10,10,10,.55) 0%,rgba(10,10,10,0) 45%); }
+@media (max-width:860px) {
+  .cine-color::before { background:linear-gradient(0deg,rgba(10,10,10,.8) 0%,rgba(10,10,10,.3) 60%,rgba(10,10,10,.1) 100%); }
+}
+

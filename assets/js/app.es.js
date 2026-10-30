@@ -10,6 +10,10 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;'
 const money = n => 'US$' + (Math.round(n * 100) / 100).toFixed(2).replace(/\.00$/, '');
 const money2 = n => 'US$' + (Math.round(n * 100) / 100).toFixed(2);
 const tpl = id => document.getElementById(id).innerHTML;
+const MEDIA = n => `../assets/media/${n}`;
+/* cinematic athlete footage: the poster shows first, the video streams in near the viewport (bindCine) */
+function cineMedia(clip, eager) { return `<div class="cine-media" aria-hidden="true"><img src="${MEDIA(clip)}.jpg" alt=""${eager ? ' fetchpriority="high"' : ' loading="lazy"'}><video muted loop playsinline preload="none" data-src="${MEDIA(clip)}.mp4"></video></div>`; }
+function cineStill(photo, eager) { return `<div class="cine-media" aria-hidden="true"><img src="${MEDIA(photo)}.webp" alt=""${eager ? ' fetchpriority="high"' : ' loading="lazy"'}></div>`; }
 const SUB_OFF = 0.15, FREE_SHIP = 75;
 
 /* ------------------------------------------------------------ catálogo */
@@ -217,15 +221,12 @@ function viewHome() {
   const cats = [['fuel', 'Energía', 'Geles de carbohidratos y mezcla de carbos + sodio', '01', 'gel-citrus'], ['hydrate', 'Hidratación', 'Sodio, dosificado según tu sudor', '02', 'na-1000'], ['build', 'Fuerza', 'Creatina monohidratada', '03', 'cre-300'], ['ignite', 'Activación', 'Pre-entreno', '04', 'pre-mango']];
   const featured = ['carb-gel-30', 'fuel-mix-60', 'sodium', 'carb-gel-30-caffeine', 'pre-workout', 'creatine'];
   return `
-  <section class="hero"><div class="wrap hero-in">
-    <div class="hero-copy">
+  <section class="cine cine-color cine-hero" style="--pos:50% 25%">${cineStill('run-track', true)}<div class="wrap cine-in">
       <span class="eyebrow">Soulset Athletics · Nutrición deportiva</span>
       <h1 class="d-xxl">Mentalidad&nbsp;<span class="gt">&gt;</span> todo</h1>
       <p class="lead">Energía, hidratación y fuerza para atletas que le ponen toda el alma. Dosis claras, sin relleno, hechos para el calor y las horas largas.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Ver los productos <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#manifesto">Lee el manifiesto</a></div>
       <div class="hero-facts"><span>Cada dosis impresa al frente</span><span>Diseñado para el calor caribeño</span><span>Suscríbete y ahorra 15%</span></div>
-    </div>
-    <div class="hero-art"><div class="hero-chev">${tpl('t-chev')}</div><img class="hero-img" src="${IMG('hero')}" alt="Potes de Pre-Workout, Fuel Mix 60 y Creatine de Soulset con tres sobres de Carb Gel 30" width="1500" height="1000"></div>
   </div></section>
   <div class="ticker" aria-hidden="true"><div class="ticker-track">${Array(2).fill('<span>Cree</span><span class="gt">›</span><span>Actúa</span><span class="gt">›</span><span>Resultados</span><span class="gt">›</span><span>Cree</span><span class="gt">›</span><span>Sin descanso</span><span class="gt">›</span><span>Mentalidad <i>&gt;</i> todo</span><span class="gt">›</span>').join('')}</div></div>
 
@@ -262,10 +263,10 @@ function viewHome() {
     </div>
   </section>
 
-  <section class="section-tight" style="border-top:1px solid var(--line)"><div class="wrap news">
+  <section class="cine cine-bw" style="--pos:60% 30%">${cineStill('gym-barbell')}<div class="wrap cine-in" style="--h:clamp(440px,64vh,640px)"><div class="news">
     <div style="display:grid;gap:12px"><span class="eyebrow">Únete a la lista de espera</span><h2 class="d-l">Sin descanso</h2><p class="lead">Entérate primero cuando Soulset se lance y recibe 10% de descuento en tu primer pedido.</p></div>
     <div><form id="newsForm" novalidate><label class="sr" for="newsEmail">Correo electrónico</label><input id="newsEmail" type="email" placeholder="tu@correo.com" autocomplete="email" required><button class="btn btn-primary" type="submit">Únete a la lista</button></form><p class="news-msg" id="newsMsg"></p></div>
-  </div></section>`;
+  </div></div></section>`;
 }
 function bindHome(root) {
   bindCardAdds(root); bindPlanner(root);
@@ -463,6 +464,10 @@ function viewManifesto() {
     </section>
   </div>
 
+  <section class="cine cine-center">${cineMedia('sweat-bw')}<div class="wrap cine-in" style="--h:clamp(460px,72vh,760px)">
+    <h2 class="d-xl" style="max-width:15ch">Madrugadas. Kilómetros en silencio. Trabajo que nadie vio.</h2>
+  </div></section>
+
   <section class="band"><div class="wrap section" style="display:grid;gap:20px;justify-items:start">
     <span class="eyebrow">La regla</span>
     <h2 class="d-xxl">Mentalidad&nbsp;<span class="gt">&gt;</span> todo</h2>
@@ -491,13 +496,13 @@ function viewManifesto() {
       <div style="display:grid;gap:24px"><div style="display:grid;gap:12px"><span class="eyebrow">La marca</span><h2 class="d-l">Sube de nivel, tres veces</h2><p class="lead">Nuestra S se inclina hacia adelante. Nuestra A está hecha de tres chevrones ascendentes, uno por cada paso del ciclo. Juntas se leen SA: Soulset Athletics.</p></div>
         <ol><li><span class="mono">01</span><div><b>Cree</b><p>El primer chevrón. Convence a tu mente.</p></div></li><li><span class="mono">02</span><div><b>Actúa</b><p>El segundo. Haz el trabajo, sobre todo cuando no tienes ganas.</p></div></li><li><span class="mono">03</span><div><b>Resultados</b><p>El tercero. Ganados, y usados para volver a creer.</p></div></li></ol></div>
     </section>
+  </div>
 
-    <section class="section" style="padding-top:0;display:grid;gap:28px;justify-items:start;border-top:1px solid var(--line);padding-top:clamp(72px,9vw,128px)">
+  <section class="cine cine-bw cine-flip" style="--pos:30% 40%">${cineStill('gym-sweat')}<div class="wrap cine-in">
       <h2 class="d-xxl">Sin descanso</h2>
       <p class="lead">Prepárate para el éxito con las mejores herramientas posibles. Después, ponle toda el alma.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Ver los productos <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#fuel-planner">Arma tu plan</a></div>
-    </section>
-  </div>`;
+  </div></section>`;
 }
 
 /* ------------------------------------------------------------ ayuda */
@@ -607,6 +612,17 @@ function viewWaitlistDone() {
     </div></div>`;
 }
 
+/* ------------------------------------------------------------ cinematic footage */
+// Reduced motion and Save-Data keep the still poster; otherwise videos load near the viewport and pause off-screen.
+const quietMotion = matchMedia('(prefers-reduced-motion: reduce)').matches || !!(navigator.connection && navigator.connection.saveData);
+const cineObs = 'IntersectionObserver' in window && !quietMotion ? new IntersectionObserver(es => es.forEach(e => {
+  const v = e.target;
+  if (!e.isIntersecting) return v.pause();
+  if (!v.src) { v.muted = true; v.src = v.dataset.src; v.addEventListener('playing', () => v.classList.add('on'), { once: true }); }
+  v.play().catch(() => {});
+}), { rootMargin: '200px 0px' }) : null;
+function bindCine(root) { if (!cineObs) return; cineObs.disconnect(); $$('.cine-media video', root).forEach(v => cineObs.observe(v)); }
+
 /* ------------------------------------------------------------ router */
 const view = $('#view');
 function setTitle(t) { document.title = t ? `${t} · Soulset Athletics` : 'Soulset Athletics'; }
@@ -622,7 +638,7 @@ function render() {
   else if (h === 'waitlist' || h === 'checkout') { html = viewWaitlist(); bind = bindWaitlist; title = 'Únete a la lista de espera'; nav = 'waitlist'; }
   else if (h === 'waitlist-confirmed' || h === 'order-confirmed') { const done = !!store.get('waitlist', null); html = viewWaitlistDone(); bind = done ? () => {} : bindWaitlist; title = done ? 'Ya estás en la lista' : 'Únete a la lista de espera'; nav = 'waitlist'; }
   else { html = `<div class="wrap conf"><h1 class="d-xl">Página no encontrada</h1><p class="lead">Esa página no existe. Tu próxima sesión sí.</p><div><a class="btn btn-primary btn-l" href="#shop">Ver todo</a></div></div>`; title = 'No encontrada'; }
-  view.innerHTML = html; bind(view); setTitle(title);
+  view.innerHTML = html; bind(view); bindCine(view); setTitle(title);
   $$('.nav a').forEach(a => a.toggleAttribute('aria-current', false));
   $$('.nav a').forEach(a => { if (a.dataset.nav === nav) a.setAttribute('aria-current', 'page'); });
   $('#shopBtn').classList.toggle('is-current', nav.startsWith('shop'));
