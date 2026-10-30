@@ -484,3 +484,14 @@ input[type=range] { width:100%; accent-color:var(--ignite); height:28px; }
 @media (max-width:860px) {
   .cine-color::before { background:linear-gradient(0deg,rgba(10,10,10,.8) 0%,rgba(10,10,10,.3) 60%,rgba(10,10,10,.1) 100%); }
 }
+
+/* film grade (footers): teal shadows, warm highlights, crushed blacks and a heavy vignette, like a graded sports spot */
+.cine-film .cine-media img, .cine-film .cine-media video { filter:contrast(1.22) saturate(1.25) brightness(.92); }
+.cine-film .cine-media::after { content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light;
+  background:linear-gradient(180deg,rgba(0,120,140,.55) 0%,rgba(0,90,110,.25) 45%,rgba(255,130,40,.35) 100%); }
+.cine-film::before { background:radial-gradient(120% 95% at 60% 45%,transparent 35%,rgba(0,0,0,.7) 100%),
+                     linear-gradient(90deg,rgba(10,10,10,.6) 0%,rgba(10,10,10,.15) 55%,rgba(10,10,10,0) 100%),
+                     linear-gradient(0deg,rgba(10,10,10,.6) 0%,rgba(10,10,10,0) 45%); }
+@media (max-width:860px) {
+  .cine-film::before { background:linear-gradient(0deg,rgba(10,10,10,.85) 0%,rgba(10,10,10,.35) 60%,rgba(10,10,10,.15) 100%); }
+}

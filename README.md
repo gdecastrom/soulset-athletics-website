@@ -86,11 +86,11 @@ The product catalogue (names, options, prices, nutrition) lives in the `P` array
 Full-bleed athlete imagery sits behind four sections:
 
 - **Home hero:** still photo in full colour (`.cine-color`)
-- **Home waitlist sign-up:** looping clip in full colour (`.cine-color`)
+- **Home waitlist sign-up:** looping clip with the film grade (`.cine-film`: teal shadows, warm highlights, heavy vignette)
 - **Manifesto mid-page line:** looping clip
-- **Manifesto closer:** still photo, black-and-white grade (`.cine-bw`), mirrored so the runner is on the right (`.cine-flip`)
+- **Manifesto closer:** still photo with the film grade
 
-Everything lives in `assets/media/`. A clip is a pair, `<name>.mp4` plus a `<name>.jpg` poster, used as `cineMedia('<name>')`. A still is `<name>.webp`, used as `cineStill('<name>')`. Both helpers are in `app.js` / `app.es.js`. The grade is applied in CSS, so footage can be shot in colour.
+Everything lives in `assets/media/`. A clip is a pair, `<name>.mp4` plus a `<name>.jpg` poster, used as `cineMedia('<name>')`. A still is `<name>.webp`, used as `cineStill('<name>')`. Both helpers are in `app.js` / `app.es.js`. `cineMedia('<name>', false, 11)` loops a clip at 11 s, to cut an unusable tail. The grade is applied in CSS, so footage can be shot in colour.
 
 - A clip's poster shows first. The video loads only when its section nears the viewport and pauses when it scrolls away.
 - Visitors with reduced motion or Data Saver turned on only see the poster.
@@ -99,8 +99,9 @@ Everything lives in `assets/media/`. A clip is a pair, `<name>.mp4` plus a `<nam
 
 The current media are placeholders:
 
-- Clips from [Mixkit](https://mixkit.co/license/#videoFree), free for commercial use with no attribution required: sweat-bw 50964, train-ropes 52088.
-- Stills from [Unsplash](https://unsplash.com/license), free for commercial use: run-street (photo-1759834857374) and run-track (photo-1766970096346).
+- [Mixkit](https://mixkit.co/license/#videoFree) clip, free for commercial use with no attribution required: sweat-bw 50964
+- [Pexels](https://www.pexels.com/license/) clip, free for commercial use: run-beach 3191933
+- [Unsplash](https://unsplash.com/license) stills, free for commercial use: run-track (photo-1766970096346), run-sunburst (photo-1552674605)
 
 ## Brand system
 
