@@ -519,12 +519,12 @@ function viewHelp() {
    With no endpoint set, the site runs in demo mode and keeps the sign-up in this browser only. */
 const WAITLIST_URL = String((window.SOULSET_CONFIG || {}).waitlistEndpoint || '').trim();
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const COUNTRIES = { DO: 'Dominican Republic', PR: 'Puerto Rico', US: 'United States', OTHER: 'Somewhere else' };
+const PROVINCES = ['Azua', 'Bahoruco', 'Barahona', 'Dajabón', 'Distrito Nacional', 'Duarte', 'El Seibo', 'Elías Piña', 'Espaillat', 'Hato Mayor', 'Hermanas Mirabal', 'Independencia', 'La Altagracia', 'La Romana', 'La Vega', 'María Trinidad Sánchez', 'Monseñor Nouel', 'Monte Cristi', 'Monte Plata', 'Pedernales', 'Peravia', 'Puerto Plata', 'Samaná', 'San Cristóbal', 'San José de Ocoa', 'San Juan', 'San Pedro de Macorís', 'Sánchez Ramírez', 'Santiago', 'Santiago Rodríguez', 'Santo Domingo', 'Valverde'];
 function picks() { return cart.map(l => ({ id: l.id, name: byId[l.id].name, options: optSummary(l), qty: l.qty, subscribe: !!l.sub })); }
 async function joinWaitlist(data) {
   const list = picks();
   const payload = {
-    email: data.email, firstName: data.firstName || '', country: data.country || '',
+    email: data.email, firstName: data.firstName || '', province: data.province || '',
     picks: list, picksSummary: list.map(p => `${p.qty} × ${p.name} (${p.options})`).join('; '),
     source: data.source || 'website', language: navigator.language || '', siteLanguage: 'en', submittedAt: new Date().toISOString(),
   };
@@ -534,7 +534,7 @@ async function joinWaitlist(data) {
   } else {
     console.warn('[Soulset] Demo mode: no waitlistEndpoint is set, so this sign-up was not sent anywhere.', payload);
   }
-  store.set('waitlist', { email: payload.email, firstName: payload.firstName, at: payload.submittedAt });
+  store.set('waitlist', { email: payload.email, firstName: payload.firstName, province: payload.province, at: payload.submittedAt });
   return payload;
 }
 
@@ -559,7 +559,7 @@ function viewWaitlist() {
       <fieldset class="fs"><legend class="sr">Your details</legend>
         ${f('wlEmail', 'Email', `type="email" autocomplete="email" required placeholder="you@email.com" value="${esc(saved ? saved.email : '')}"`)}
         <div class="row2">${f('wlFirst', 'First name (optional)', `autocomplete="given-name" value="${esc(saved ? saved.firstName : '')}"`)}
-          <div class="f"><label for="wlCountry">Where do you train?</label><select class="select" id="wlCountry" name="wlCountry" autocomplete="country">${Object.entries(COUNTRIES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div></div>
+          <div class="f"><label for="wlProvince">Which province do you train in?</label><select class="select" id="wlProvince" name="wlProvince" autocomplete="address-level1"><option value="">Choose your province</option>${PROVINCES.map(v => `<option${saved && saved.province === v ? ' selected' : ''}>${v}</option>`).join('')}</select></div></div>
         <div class="hp" aria-hidden="true"><label for="wlCompany">Company</label><input id="wlCompany" name="company" tabindex="-1" autocomplete="off"></div>
       </fieldset>
       <div style="display:grid;gap:10px">
@@ -583,7 +583,7 @@ function bindWaitlist(root) {
     const btn = $('#wlBtn', root); btn.disabled = true;
     $('#processing').classList.add('on');
     try {
-      await joinWaitlist({ email, firstName: $('#wlFirst', root).value.trim(), country: $('#wlCountry', root).value, source: 'waitlist-page' });
+      await joinWaitlist({ email, firstName: $('#wlFirst', root).value.trim(), province: $('#wlProvince', root).value, source: 'waitlist-page' });
       location.hash = 'waitlist-confirmed';
     } catch (err) {
       setErr('wl', `We couldn’t save your spot. Check your connection and try again.`);
