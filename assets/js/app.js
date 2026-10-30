@@ -10,7 +10,7 @@ const money2 = n => 'US$' + (Math.round(n * 100) / 100).toFixed(2);
 const tpl = id => document.getElementById(id).innerHTML;
 const MEDIA = n => `assets/media/${n}`;
 /* cinematic athlete footage: the poster shows first, the video streams in near the viewport (bindCine) */
-function cineMedia(clip, eager, end) { return `<div class="cine-media" aria-hidden="true"><img src="${MEDIA(clip)}.jpg" alt=""${eager ? ' fetchpriority="high"' : ' loading="lazy"'}><video muted loop playsinline preload="none" data-src="${MEDIA(clip)}.mp4"${end ? ` data-end="${end}"` : ''}></video></div>`; }
+function cineMedia(clip, eager) { return `<div class="cine-media" aria-hidden="true"><img src="${MEDIA(clip)}.jpg" alt=""${eager ? ' fetchpriority="high"' : ' loading="lazy"'}><video muted loop playsinline preload="none" data-src="${MEDIA(clip)}.mp4"></video></div>`; }
 function cineStill(photo, eager) { return `<div class="cine-media" aria-hidden="true"><img src="${MEDIA(photo)}.webp" alt=""${eager ? ' fetchpriority="high"' : ' loading="lazy"'}></div>`; }
 const SUB_OFF = 0.15, FREE_SHIP = 75;
 
@@ -260,7 +260,7 @@ function viewHome() {
     </div>
   </section>
 
-  <section class="cine cine-film" style="--pos:50% 30%">${cineMedia('run-beach', false, 11)}<div class="wrap cine-in" style="--h:clamp(440px,64vh,640px)"><div class="news">
+  <section class="cine cine-bw" style="--pos:60% 30%">${cineStill('gym-barbell')}<div class="wrap cine-in" style="--h:clamp(440px,64vh,640px)"><div class="news">
     <div style="display:grid;gap:12px"><span class="eyebrow">Join the waitlist</span><h2 class="d-l">Stay relentless</h2><p class="lead">Be first to know when Soulset launches, and get 10% off your first order.</p></div>
     <div><form id="newsForm" novalidate><label class="sr" for="newsEmail">Email address</label><input id="newsEmail" type="email" placeholder="you@email.com" autocomplete="email" required><button class="btn btn-primary" type="submit">Join the waitlist</button></form><p class="news-msg" id="newsMsg"></p></div>
   </div></div></section>`;
@@ -495,7 +495,7 @@ function viewManifesto() {
     </section>
   </div>
 
-  <section class="cine cine-film" style="--pos:50% 15%">${cineStill('run-sunburst')}<div class="wrap cine-in">
+  <section class="cine cine-bw cine-flip" style="--pos:30% 40%">${cineStill('gym-sweat')}<div class="wrap cine-in">
       <h2 class="d-xxl">Stay relentless</h2>
       <p class="lead">Set yourself up for success with the best tools possible. Then put your whole soul into it.</p>
       <div class="hero-cta"><a class="btn btn-primary btn-l" href="#shop">Shop the fuel <span class="edge">›</span></a><a class="btn btn-secondary btn-l" href="#fuel-planner">Build a fuel plan</a></div>
@@ -615,9 +615,7 @@ const quietMotion = matchMedia('(prefers-reduced-motion: reduce)').matches || !!
 const cineObs = 'IntersectionObserver' in window && !quietMotion ? new IntersectionObserver(es => es.forEach(e => {
   const v = e.target;
   if (!e.isIntersecting) return v.pause();
-  if (!v.src) { v.muted = true; v.src = v.dataset.src; v.addEventListener('playing', () => v.classList.add('on'), { once: true });
-    // data-end loops a clip early, before an unusable tail
-    if (v.dataset.end) v.addEventListener('timeupdate', () => { if (v.currentTime > +v.dataset.end) v.currentTime = 0; }); }
+  if (!v.src) { v.muted = true; v.src = v.dataset.src; v.addEventListener('playing', () => v.classList.add('on'), { once: true }); }
   v.play().catch(() => {});
 }), { rootMargin: '200px 0px' }) : null;
 function bindCine(root) { if (!cineObs) return; cineObs.disconnect(); $$('.cine-media video', root).forEach(v => cineObs.observe(v)); }
