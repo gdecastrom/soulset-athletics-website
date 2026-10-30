@@ -621,11 +621,19 @@ function render() {
   else { html = `<div class="wrap conf"><h1 class="d-xl">Page not found</h1><p class="lead">That page doesn't exist. Your next session does.</p><div><a class="btn btn-primary btn-l" href="#shop">Shop all</a></div></div>`; title = 'Not found'; }
   view.innerHTML = html; bind(view); setTitle(title);
   $$('.nav a').forEach(a => a.toggleAttribute('aria-current', false));
-  $$('.nav a').forEach(a => { if (a.dataset.nav === nav || (nav.startsWith('shop') && a.dataset.nav === 'shop' && nav === 'shop')) a.setAttribute('aria-current', 'page'); });
+  $$('.nav a').forEach(a => { if (a.dataset.nav === nav) a.setAttribute('aria-current', 'page'); });
+  $('#shopBtn').classList.toggle('is-current', nav.startsWith('shop'));
+  closeShop(shopDrop.matches(':hover'));
   $('#mnav').classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded', 'false');
   $$('[data-lang-base]').forEach(a => { a.href = a.dataset.langBase + location.hash; });
   window.scrollTo(0, 0);
 }
+const shopDrop = $('#shopDrop'), shopBtn = $('#shopBtn');
+function closeShop(shut) { shopDrop.classList.remove('open'); shopBtn.setAttribute('aria-expanded', 'false'); if (shut) shopDrop.classList.add('shut'); }
+shopBtn.addEventListener('click', () => { if (shopDrop.classList.contains('open')) return closeShop(true); shopDrop.classList.add('open'); shopDrop.classList.remove('shut'); shopBtn.setAttribute('aria-expanded', 'true'); });
+shopDrop.addEventListener('mouseleave', () => shopDrop.classList.remove('shut'));
+document.addEventListener('click', e => { if (!shopDrop.contains(e.target)) closeShop(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && shopDrop.classList.contains('open')) { closeShop(); shopBtn.focus(); } });
 $('#menuBtn').addEventListener('click', () => { const m = $('#mnav'); const o = m.classList.toggle('open'); $('#menuBtn').setAttribute('aria-expanded', o); });
 $('#footStack').innerHTML = tpl('t-stack');
 $('#spinChev').innerHTML = tpl('t-chev');
