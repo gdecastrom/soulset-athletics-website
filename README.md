@@ -16,12 +16,10 @@ Orders aren't open yet, so there is no checkout or payment flow. Visitors can st
 
 ### Connecting the waitlist (required before going live)
 
-Out of the box the site runs in **demo mode**: sign-ups are only kept in the visitor's browser and nothing is sent anywhere (a warning is logged to the console). To collect emails, set the endpoint near the top of `index.html`:
+Out of the box the site runs in **demo mode**: sign-ups are only kept in the visitor's browser and nothing is sent anywhere (a warning is logged to the console). To collect emails, set the endpoint in `assets/js/config.js` (shared by the English and Spanish sites):
 
-```html
-<script>
-  window.SOULSET_CONFIG = { waitlistEndpoint: 'https://formspree.io/f/your-form-id' };
-</script>
+```js
+window.SOULSET_CONFIG = { waitlistEndpoint: 'https://formspree.io/f/your-form-id' };
 ```
 
 The site sends a `POST` with a JSON body and treats any 2xx response as success. Any service that accepts JSON from the browser (with CORS) works. The quickest option is [Formspree](https://formspree.io): create a form, copy its endpoint URL, paste it above, and sign-ups arrive in your inbox and the Formspree dashboard, exportable as CSV.
@@ -37,11 +35,18 @@ Payload sent for each sign-up:
   "picksSummary": "1 × Sodium (1000 mg)",
   "source": "waitlist-page",
   "language": "es-DO",
+  "siteLanguage": "es",
   "submittedAt": "2026-10-30T13:50:14.279Z"
 }
 ```
 
-`source` is `waitlist-page` or `home`. `picks` tells you which products people want most before launch. A hidden honeypot field filters out simple bots.
+`source` is `waitlist-page` or `home`. `siteLanguage` is `en` or `es`, depending on which version of the site the visitor used. `picks` tells you which products people want most before launch. A hidden honeypot field filters out simple bots.
+
+## Spanish site
+
+A Spanish version lives at `/es/` (`es/index.html` + `assets/js/app.es.js`), with an EN/ES switch in the header that keeps the current page. Routes (`#shop`, `#p-<id>`, …) are the same in both.
+
+`app.es.js` is a translated copy of `app.js`: same logic, Spanish copy and catalogue text. **When you change behaviour or prices in one, make the same change in the other.** Each language keeps its own cart and waitlist state in the browser (storage keys `ss_` and `ss_es_`), because cart lines store option names in their own language.
 
 ## Run locally
 
@@ -61,9 +66,12 @@ python3 -m http.server 8000
 ## Structure
 
 ```
-index.html              Page shell, header, footer, cart drawer, waitlist config
+index.html              Page shell, header, footer, cart drawer (English)
+es/index.html           Spanish page shell
 assets/css/site.css     Design tokens and all styles
-assets/js/app.js        Catalogue data, routing, cart, fuel planner, waitlist
+assets/js/config.js     Waitlist endpoint (shared)
+assets/js/app.js        Catalogue data, routing, cart, fuel planner, waitlist (English)
+assets/js/app.es.js     Spanish copy of app.js
 assets/fonts/           Saira Extra Condensed, Barlow, IBM Plex Mono (subset woff2)
 assets/img/             Product renders (webp)
 assets/favicon.svg      Double-chevron mark

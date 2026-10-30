@@ -232,7 +232,7 @@ function viewHome() {
   </section>
 
   <section class="section-tight wrap" style="padding-top:0">
-    <div class="sec-head"><div><span class="eyebrow">The line-up</span><h2 class="d-l">Tools for the work</h2></div><a class="btn-ghost btn" href="#shop">View all 8 <span class="edge">›</span></a></div>
+    <div class="sec-head"><div><span class="eyebrow">The line-up</span><h2 class="d-l">Your passion, our fuel</h2></div><a class="btn-ghost btn" href="#shop">View all 8 <span class="edge">›</span></a></div>
     <div class="grid" id="homeGrid">${featured.map(id => card(byId[id])).join('')}</div>
   </section>
 
@@ -330,7 +330,7 @@ function viewProduct(p) {
           ${p.nutrition ? `<details open><summary>What's inside</summary><div class="acc-body">${nutritionHTML(p.nutrition)}</div></details>` : ''}
           <details ${p.nutrition ? '' : 'open'}><summary>How to use</summary><div class="acc-body"><ul style="margin:0;padding-left:18px;display:grid;gap:6px">${p.use.map(u => `<li>${esc(u)}</li>`).join('')}</ul></div></details>
           ${p.ingredients ? `<details><summary>Ingredients</summary><div class="acc-body"><p>${esc(p.ingredients)}</p>${p.warn ? `<p style="color:var(--bone)">${esc(p.warn)}</p>` : ''}</div></details>` : ''}
-          <details><summary>Shipping &amp; returns</summary><div class="acc-body"><p>Dominican Republic: 2–4 business days, or next day in Santo Domingo and Santiago with Express. Puerto Rico and the US: 5–8 business days. Free standard shipping over US$75. Unopened products can be returned within 30 days.</p></div></details>
+          <details><summary>Shipping &amp; returns</summary><div class="acc-body"><p>We ship across the Dominican Republic: 2–4 business days, or next day in Santo Domingo and Santiago with Express. No international shipping yet. Free standard shipping over US$75. Unopened products can be returned within 30 days.</p></div></details>
         </div>
       </div>
     </div>
@@ -446,7 +446,7 @@ function viewManifesto() {
       <div class="def"><div class="def-word">Soul<br>set</div>
         <div class="def-body"><span class="pos">soul·set /ˈsōlˌset/ · noun</span>
           <p style="font-size:22px;color:var(--bone)">The empowered attitude of putting your whole soul into something.</p>
-          <blockquote>"He got the promotion because of his hustler soulset."</blockquote>
+          <blockquote>"Her soulset showed up long before race day. It lived in the early starts, the quiet miles, and the work no one saw."</blockquote>
           <p style="color:var(--muted)">The name is two words pressed into one: <b style="color:var(--bone)">soul</b> and <b style="color:var(--bone)">mindset</b>. It means putting your whole soul into whatever you are doing.</p></div></div>
     </section>
 
@@ -501,8 +501,8 @@ function viewManifesto() {
 function viewHelp() {
   const faq = [
     ['When can I order?', 'Soulset is in pre-launch. Join the waitlist and we will email you the day orders open, with 10% off your first order. Prices and formulas shown here may still change before launch.'],
-    ['Where do you ship?', 'At launch we will ship across the Dominican Republic, to Puerto Rico and to the United States, with free standard shipping on orders over US$75.'],
-    ['How long does delivery take?', 'Dominican Republic: 2–4 business days, or next business day in Santo Domingo and Santiago with Express. Pickup in Santo Domingo is free. Puerto Rico and the US: 5–8 business days standard, 2–3 with Express.'],
+    ['Where do you ship?', 'At launch we will ship across the Dominican Republic, with free standard shipping on orders over US$75. We don’t ship internationally yet.'],
+    ['How long does delivery take?', 'Dominican Republic: 2–4 business days, or next business day in Santo Domingo and Santiago with Express. Pickup in Santo Domingo is free.'],
     ['How does Subscribe & save work?', 'You save 15% on every subscribed product, delivered every 4 weeks. Skip, change or cancel any time before your next order ships.'],
     ['What is your return policy?', 'Unopened products can be returned within 30 days for a full refund. If something arrives damaged, email us a photo and we will replace it.'],
     ['Which gel should I use?', 'Carb Gel 30 for most of your fuelling. Swap in Carb Gel 30 Caffeine (Level 1 or 2) in the second half of long sessions. The chevrons on the pack show the caffeine level.'],
@@ -526,7 +526,7 @@ async function joinWaitlist(data) {
   const payload = {
     email: data.email, firstName: data.firstName || '', country: data.country || '',
     picks: list, picksSummary: list.map(p => `${p.qty} × ${p.name} (${p.options})`).join('; '),
-    source: data.source || 'website', language: navigator.language || '', submittedAt: new Date().toISOString(),
+    source: data.source || 'website', language: navigator.language || '', siteLanguage: 'en', submittedAt: new Date().toISOString(),
   };
   if (WAITLIST_URL) {
     const res = await fetch(WAITLIST_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) });
@@ -623,6 +623,7 @@ function render() {
   $$('.nav a').forEach(a => a.toggleAttribute('aria-current', false));
   $$('.nav a').forEach(a => { if (a.dataset.nav === nav || (nav.startsWith('shop') && a.dataset.nav === 'shop' && nav === 'shop')) a.setAttribute('aria-current', 'page'); });
   $('#mnav').classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded', 'false');
+  $$('[data-lang-base]').forEach(a => { a.href = a.dataset.langBase + location.hash; });
   window.scrollTo(0, 0);
 }
 $('#menuBtn').addEventListener('click', () => { const m = $('#mnav'); const o = m.classList.toggle('open'); $('#menuBtn').setAttribute('aria-expanded', o); });
