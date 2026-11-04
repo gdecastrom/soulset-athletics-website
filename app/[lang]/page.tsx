@@ -31,7 +31,7 @@ export default async function Home({ params }: PageProps) {
         <CineMedia still="run-track" priority />
         <div className="wrap cine-in">
           <span className="eyebrow">{h.eyebrow}</span>
-          <h1 className="d-xxl">{h.h1a}{lang === 'es' ? ' ' : ' '}<span className="gt">&gt;</span> {h.h1b}</h1>
+          <h1 className="d-xxl">{h.h1a}{lang === 'es' ? '\u00a0' : ' '}<span className="gt">&gt;</span> {h.h1b}</h1>
           <p className="lead">{h.lead}</p>
           <div className="hero-cta">
             <Link className="btn btn-primary btn-l" href={l('/shop')}>{h.shop} <span className="edge">›</span></Link>

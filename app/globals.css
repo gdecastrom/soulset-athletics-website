@@ -266,7 +266,7 @@ input[type=range] { width:100%; accent-color:var(--ignite); height:28px; }
 /* manifesto page */
 .mf-hero { padding-block:clamp(64px,10vw,140px) clamp(48px,6vw,80px); display:grid; gap:28px; }
 .def { display:grid; grid-template-columns:auto 1fr; gap:clamp(24px,5vw,80px); align-items:start; }
-.def-word { font-family:var(--display); font-weight:900; font-size:clamp(72px,12vw,180px); line-height:.82; text-transform:uppercase; }
+.def-word { margin:0; font-family:var(--display); font-weight:900; font-size:clamp(72px,12vw,180px); line-height:.82; text-transform:uppercase; }
 .def-body { display:grid; gap:14px; padding-top:12px; max-width:56ch; }
 .def-body .pos { font-family:var(--mono); color:var(--muted); font-size:14px; }
 .def-body blockquote { margin:0; border-left:2px solid var(--ignite); padding-left:16px; font-style:italic; color:var(--muted); }

@@ -1,6 +1,6 @@
 'use client';
 /* Cart state for the whole site, kept in localStorage. Pre-launch the cart is a wishlist that goes with the waitlist sign-up. */
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { getProduct, subPrice, unitPrice, type CartLine, type Opts } from '../lib/catalog.ts';
 import { dict } from '../lib/dict.ts';
 import type { Lang } from '../lib/i18n.ts';
@@ -46,21 +46,35 @@ function clean(raw: unknown): CartLine[] {
   });
 }
 
+/* The cart is kept outside React, in localStorage plus a copy in memory, so every CartProvider reads the same one.
+   Each language has its own layout, so switching language mounts a new provider: reading the store directly means the
+   cart doesn't blink empty, and other tabs see changes through the storage event. The server always renders it empty. */
+const EMPTY: CartLine[] = [];
+let memory: CartLine[] | null = null;
+const listeners = new Set<() => void>();
+
+function readCart(): CartLine[] {
+  if (memory) return memory;
+  try { memory = clean(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch { memory = []; /* storage blocked: start empty */ }
+  return memory;
+}
+function updateCart(change: (prev: CartLine[]) => CartLine[]) {
+  memory = change(readCart());
+  try { localStorage.setItem(KEY, JSON.stringify(memory)); } catch { /* private mode: keep it in memory */ }
+  listeners.forEach(l => l());
+}
+function subscribe(listener: () => void) {
+  const onStorage = (e: StorageEvent) => { if (e.key === KEY) { memory = null; listener(); } };
+  listeners.add(listener);
+  window.addEventListener('storage', onStorage);
+  return () => { listeners.delete(listener); window.removeEventListener('storage', onStorage); };
+}
+
 export function CartProvider({ lang, children }: { lang: Lang; children: ReactNode }) {
-  const [lines, setLines] = useState<CartLine[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const lines = useSyncExternalStore(subscribe, readCart, () => EMPTY);
   const [isOpen, setOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  useEffect(() => {
-    try { setLines(clean(JSON.parse(localStorage.getItem(KEY) || '[]'))); } catch { /* storage blocked: start empty */ }
-    setLoaded(true);
-  }, []);
-  useEffect(() => {
-    if (!loaded) return;
-    try { localStorage.setItem(KEY, JSON.stringify(lines)); } catch { /* private mode: keep in memory */ }
-  }, [lines, loaded]);
 
   const toast = useCallback((msg: string) => {
     setToastMsg(msg);
@@ -70,7 +84,7 @@ export function CartProvider({ lang, children }: { lang: Lang; children: ReactNo
 
   const add = useCallback((id: string, opts: Opts, qty = 1, sub = false, openDrawer = true) => {
     const line: CartLine = { id, opts: { ...opts }, qty, sub };
-    setLines(prev => {
+    updateCart(prev => {
       const i = prev.findIndex(l => sameLine(l, line));
       if (i < 0) return [...prev, line];
       return prev.map((l, j) => (j === i ? { ...l, qty: Math.min(99, l.qty + qty) } : l));
@@ -85,8 +99,8 @@ export function CartProvider({ lang, children }: { lang: Lang; children: ReactNo
     open: () => setOpen(true),
     close: () => setOpen(false),
     add,
-    setQty: (index, qty) => setLines(prev => (qty < 1 ? prev.filter((_, j) => j !== index) : prev.map((l, j) => (j === index ? { ...l, qty: Math.min(99, qty) } : l)))),
-    remove: index => setLines(prev => prev.filter((_, j) => j !== index)),
+    setQty: (index, qty) => updateCart(prev => (qty < 1 ? prev.filter((_, j) => j !== index) : prev.map((l, j) => (j === index ? { ...l, qty: Math.min(99, qty) } : l)))),
+    remove: index => updateCart(prev => prev.filter((_, j) => j !== index)),
     toast,
   }), [lang, lines, isOpen, add, toast]);
 

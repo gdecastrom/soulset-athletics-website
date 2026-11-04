@@ -21,7 +21,7 @@ export default async function Manifesto({ params }: PageProps) {
       <div className="wrap">
         <section className="mf-hero">
           <span className="eyebrow">{m.eyebrow}</span>
-          <div className="def"><div className="def-word">Soul<br />set</div>
+          <div className="def"><h1 className="def-word">Soul<br />set</h1>
             <div className="def-body"><span className="pos">{m.pos}</span>
               <p style={{ fontSize: 22, color: 'var(--bone)' }}>{m.def}</p>
               <blockquote>{m.quote}</blockquote>
@@ -44,7 +44,7 @@ export default async function Manifesto({ params }: PageProps) {
 
       <section className="band"><div className="wrap section" style={{ display: 'grid', gap: 20, justifyItems: 'start' }}>
         <span className="eyebrow">{m.ruleEyebrow}</span>
-        <h2 className="d-xxl">{dict(lang).home.h1a}{lang === 'es' ? ' ' : ' '}<span className="gt">&gt;</span> {dict(lang).home.h1b}</h2>
+        <h2 className="d-xxl">{dict(lang).home.h1a}{lang === 'es' ? '\u00a0' : ' '}<span className="gt">&gt;</span> {dict(lang).home.h1b}</h2>
         <p className="lead" style={{ color: '#3A3936' }}>{m.ruleText}</p>
       </div></section>
 

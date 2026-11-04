@@ -179,7 +179,7 @@ const en = {
     },
     number: 'Order', help: 'Questions? hola@soulsetathletics.com', shop: 'Back to the shop',
   },
-  notFound: { title: 'Page not found', text: 'That page doesn’t exist.', shopAll: 'Shop all' },
+  notFound: { title: 'Page not found', text: 'That page doesn’t exist. Your next session does.', shopAll: 'Shop all' },
 };
 
 export type Dict = typeof en;
@@ -362,7 +362,7 @@ const es: Dict = {
     },
     number: 'Pedido', help: '¿Preguntas? hola@soulsetathletics.com', shop: 'Volver a la tienda',
   },
-  notFound: { title: 'Página no encontrada', text: 'Esa página no existe.', shopAll: 'Ver todo' },
+  notFound: { title: 'Página no encontrada', text: 'Esa página no existe. Tu próxima sesión sí.', shopAll: 'Ver todo' },
 };
 
 export const DICT: Record<Lang, Dict> = { en, es };
