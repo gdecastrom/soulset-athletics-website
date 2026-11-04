@@ -42,8 +42,9 @@ export async function POST(request: Request) {
   try {
     if (await overLimit(sql, request, 'waitlist', { limit: 5, window: '10 minutes' })) return json(429, { error: 'rate_limited' });
 
-    /* Signing up again updates the same customer and sign-up: blank fields keep what we had, new picks replace
-       the old ones (no picks keeps them), and someone who had unsubscribed is subscribed again. */
+    /* Signing up again updates the same customer and sign-up: blank fields keep what we had, and new picks replace
+       the old ones (no picks keeps them). Someone who unsubscribed stays unsubscribed: anyone can type an email here,
+       so this form can't undo an unsubscribe. To come back they write to us (see README). */
     const signup = await sql.begin(async tx => {
       const [customer] = await tx<{ id: number; first_name: string | null }[]>`
         insert into customer (email, first_name, province_id)
@@ -52,15 +53,14 @@ export async function POST(request: Request) {
           first_name  = coalesce(excluded.first_name, customer.first_name),
           province_id = coalesce(excluded.province_id, customer.province_id)
         returning id, first_name`;
-      const [row] = await tx<{ id: number; inserted: boolean; confirmation_sent_at: Date | null }[]>`
+      const [row] = await tx<{ id: number; inserted: boolean; confirmation_sent_at: Date | null; unsubscribed_at: Date | null }[]>`
         insert into waitlist_signup (customer_id, source, site_language, browser_language)
         values (${customer.id}, ${s.source}, ${s.siteLanguage}, ${s.browserLanguage})
         on conflict (customer_id) do update set
           source           = excluded.source,
           site_language    = excluded.site_language,
-          browser_language = excluded.browser_language,
-          unsubscribed_at  = null
-        returning id, (xmax = 0) as inserted, confirmation_sent_at`;
+          browser_language = excluded.browser_language
+        returning id, (xmax = 0) as inserted, confirmation_sent_at, unsubscribed_at`;
       if (s.picks.length) {
         await tx`delete from waitlist_pick where waitlist_signup_id = ${row.id}`;
         const rows = s.picks.map(p => ({ sku: p.sku, quantity: p.qty, is_subscription: p.subscribe }));
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
       return { ...row, firstName: customer.first_name };
     });
 
-    if (emailEnabled() && !signup.confirmation_sent_at) {
+    if (emailEnabled() && !signup.confirmation_sent_at && !signup.unsubscribed_at) {
       const unsubscribeUrl = `${siteUrl(request)}/api/unsubscribe?id=${signup.id}&t=${signId(signup.id)}`;
       const mail = { email: s.email, firstName: signup.firstName, province: s.province, siteLanguage: s.siteLanguage, source: s.source, picks: await savedPicks(sql, signup.id) };
       try {

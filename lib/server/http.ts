@@ -16,8 +16,10 @@ export async function readJson(request: Request, maxBytes = 20_000): Promise<{ b
   try { return { body: JSON.parse(raw) }; } catch { return { error: json(400, { error: 'invalid_json' }) }; }
 }
 
+/* Base URL for links in emails and payment redirects. Vercel sets VERCEL_PROJECT_PRODUCTION_URL on previews too, so it
+   is only used in production; a preview links to itself. */
 export function siteUrl(request: Request) {
   if (process.env.SITE_URL) return process.env.SITE_URL.replace(/\/+$/, '');
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return 'https://' + process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (process.env.VERCEL_ENV === 'production' && process.env.VERCEL_PROJECT_PRODUCTION_URL) return 'https://' + process.env.VERCEL_PROJECT_PRODUCTION_URL;
   return new URL(request.url).origin;
 }

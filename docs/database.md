@@ -19,7 +19,8 @@ shown to people is the order number); money is integer cents plus its currency; 
 
 **Pre-launch (now).** A visitor browses the line-up, adds products to a cart and joins the waitlist with their email,
 optionally their first name and the province they train in. The cart goes with the sign-up as their wishlist. They get a
-confirmation email with an unsubscribe link. Signing up again updates the same sign-up.
+confirmation email with an unsubscribe link. Signing up again updates the same sign-up, but never undoes an
+unsubscribe: anyone can type an email into the form.
 
 **Launch (built, switched off).** A customer checks out: delivery details, the cart priced by the server, a pending
 order, then the payment gateway's hosted page (Azul or CardNet). The gateway reports the result; the order becomes paid,
@@ -32,19 +33,20 @@ order (database triggers).
 ## Business rules
 
 - R1. A customer is identified by email; one customer per email.
-- R2. A customer has at most one waitlist sign-up. Signing up again updates it; unsubscribing marks it, never deletes it.
+- R2. A customer has at most one waitlist sign-up. Signing up again updates it but doesn't undo an unsubscribe; unsubscribing marks it, never deletes it.
 - R3. A sign-up keeps zero or more picks; each pick is one variant, a quantity from 1 to 99, and whether it's Subscribe & save. New picks replace the old ones.
 - R4. The province, when given, is one of the 31 provinces or Distrito Nacional.
 - R5. A product belongs to one category and has zero or more options (flavour, pack…); each option has one or more values.
 - R6. A variant (SKU) is a product with exactly one value for each of its options, and only values of its own product's options.
 - R7. A variant has one list price per currency at any moment; a price change starts a new period and keeps the old one.
 - R8. Stacks can't be bought with Subscribe & save.
-- R9. An order belongs to one customer, has one or more items, ships to one address in the Dominican Republic, and is paid through one gateway.
+- R9. An order belongs to one customer, has one or more items, ships to one address in the Dominican Republic, and is paid through one gateway. It is created pending and unpaid, and its items are written with it, in the same transaction; none are added later.
 - R10. An order's total is its subtotal plus shipping; its subtotal is the sum of quantity × unit price of its items.
 - R11. An item records the price actually charged per unit; later price changes don't touch past orders.
 - R12. Order status only moves pending → paid | declined | cancelled | error, and paid → refunded. Nothing else about an order changes after it's created, and orders are never deleted.
-- R13. Every gateway callback is recorded, verified or not, and never changed.
+- R13. Every gateway callback that reaches the site is recorded (up to 8 kB) and never changed: a verified result with its order, anything that can't be verified or names an unknown order as unverified. The same verified result sent twice is recorded once.
 - R14. Products and variants removed from the catalogue are deactivated, never deleted, so old orders and wishlists keep their references.
+- R15. A payment counts only for the order's exact total and currency; a paid result for any other amount puts the order in error.
 
 ## Entities
 
@@ -85,7 +87,7 @@ order (database triggers).
 | sales_order → payment_event | 1:N | an unverified event has no order | RESTRICT |
 
 Nothing cascades: important rows are deactivated or kept, never deleted. The only deletes the site does are replacing a
-wishlist's picks and clearing day-old rate-limit rows.
+wishlist's picks and clearing rate-limit rows older than a day.
 
 ## ERD
 
@@ -170,7 +172,7 @@ erDiagram
 - Unsubscribe: set `waitlist_signup.unsubscribed_at`.
 - Demand before launch: `select * from waitlist_pick_demand`.
 - Checkout: check code prices against current `variant_price` → upsert `customer` → insert `sales_order` + `sales_order_item` (one transaction).
-- Payment result: insert `payment_event` → move `sales_order` out of `pending` once.
+- Payment result, in one transaction: lock the order → insert `payment_event` (once per identical result) → move `sales_order` out of `pending` once, to `error` if the amount doesn't match.
 - Team: orders by status and date (`sales_order_status_created` index), a customer's orders (`sales_order_customer_id`).
 
 ## Who can do what
@@ -178,18 +180,19 @@ erDiagram
 | Login | Used by | Can |
 |---|---|---|
 | Owner (Neon default role) | `scripts/release.ts` on deploy, the team in the Neon console | Everything, including migrations and catalogue sync. |
-| `soulset_app` | The site at runtime (`DATABASE_URL`) | Read the catalogue; insert customers, sign-ups, picks, orders, items, payment events; update only the columns listed in the migration; delete only picks and old rate-limit rows. Can't change the schema or switch triggers off. |
+| `soulset_app` | The site at runtime (`DATABASE_URL`) | Read the catalogue; insert customers, sign-ups, picks, orders, items, payment events; update only the columns listed in the migration; delete picks and rate-limit rows (the code only deletes rows older than a day). Can't change the schema, switch triggers off or create temporary tables. |
 
 ## Migrations
 
 - Files in `db/migrations/NNNN_name.sql`, applied in order by `lib/server/migrations.ts`, each in a transaction, recorded with a checksum in `schema_migration`.
 - An applied migration is never edited: a changed file stops the deploy. Corrections go in a new migration.
-- Applied on every deploy before the build (`npm run build` → `scripts/release.ts`), never by hand. Preview deployments use their own Neon branch.
+- Applied on every deploy before the build (`npm run build` → `scripts/release.ts`), never by hand. Production builds use `MIGRATION_DATABASE_URL`; preview builds only ever use `PREVIEW_MIGRATION_DATABASE_URL`, a Neon branch, so a branch's unfinished migration can't reach production.
+- A misnamed file in `db/migrations`, or an applied migration whose file is gone, stops the deploy.
 - Schema changes follow expand → migrate data → switch code → contract, across separate deploys.
 
 ## Validation
 
 - [x] Every table passes the guide's checklist (one concept, surrogate PK + natural UNIQUEs, atomic columns, FKs with indexes and a deliberate ON DELETE, 3NF or a written reason, NOT NULL / UNIQUE / CHECK / DEFAULT, history decided).
 - [x] Every table and column has a comment (enforced by `test/migrations.test.ts`).
-- [x] Main operations exercised by `npm test` against Postgres, also as `soulset_app`.
+- [x] Main operations exercised by `npm test` against Postgres. The tamper tests switch to `soulset_app`; to run the whole API as that login, set `TEST_ADMIN_DATABASE_URL` to the owner and `TEST_DATABASE_URL` to `soulset_app`.
 - [ ] Rehearse each new migration on a Neon branch copied from production before deploying it.

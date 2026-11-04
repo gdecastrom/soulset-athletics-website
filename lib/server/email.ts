@@ -44,27 +44,30 @@ const COPY: Record<Lang, { subject: string; heading: (name: string) => string; b
 export type EmailPick = { productId: string; opts: Opts; qty: number };
 export type EmailSignup = { email: string; firstName: string | null; province: string | null; siteLanguage: Lang; source: string; picks: EmailPick[] };
 
+/* A saved pick can outlive its product in the code (the database keeps it); such picks are left out. */
 const pickLine = (p: EmailPick, lang: Lang) => {
-  const product = getProduct(p.productId)!;
+  const product = getProduct(p.productId);
+  if (!product) return null;
   const opts = optionsLabel(product, p.opts, lang);
   return `${p.qty} × ${product.name}${opts ? ` (${opts})` : ''}`;
 };
+const pickLines = (picks: EmailPick[], lang: Lang) => picks.map(p => pickLine(p, lang)).filter((l): l is string => l != null);
 
 export function confirmationEmail({ firstName, picks, siteLanguage }: Pick<EmailSignup, 'firstName' | 'picks' | 'siteLanguage'>, unsubscribeUrl: string) {
   const t = COPY[siteLanguage] || COPY.en;
-  const pickLines = picks.map(p => pickLine(p, siteLanguage));
+  const lines = pickLines(picks, siteLanguage);
   const html = `<!doctype html><html lang="${siteLanguage}"><body style="margin:0;background:#0A0A0A">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0A0A0A"><tr><td align="center" style="padding:40px 16px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;font-family:Arial,Helvetica,sans-serif;color:#F2F0EB">
 <tr><td style="font-size:13px;font-weight:bold;letter-spacing:3px;text-transform:uppercase;padding-bottom:32px">Soulset Athletics <span style="color:#FF5A1F">&gt;</span></td></tr>
 <tr><td style="font-size:30px;font-weight:bold;line-height:1.15;text-transform:uppercase;padding-bottom:16px">${esc(t.heading(firstName ?? ''))}</td></tr>
 <tr><td style="font-size:16px;line-height:1.55;color:#D6D3CC;padding-bottom:24px">${esc(t.body)}</td></tr>
-${pickLines.length ? `<tr><td style="font-size:12px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#A3A19B;padding-bottom:8px">${esc(t.picks)}</td></tr>
-<tr><td style="font-size:15px;line-height:1.6;color:#F2F0EB;padding-bottom:24px">${pickLines.map(esc).join('<br>')}</td></tr>` : ''}
+${lines.length ? `<tr><td style="font-size:12px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#A3A19B;padding-bottom:8px">${esc(t.picks)}</td></tr>
+<tr><td style="font-size:15px;line-height:1.6;color:#F2F0EB;padding-bottom:24px">${lines.map(esc).join('<br>')}</td></tr>` : ''}
 <tr><td style="font-size:13px;line-height:1.5;color:#7D7B76;padding-bottom:32px">${esc(t.note)}</td></tr>
 <tr><td style="font-size:12px;line-height:1.5;color:#7D7B76;border-top:1px solid #2A2A28;padding-top:16px">Soulset Athletics · Santo Domingo, RD<br><a href="${esc(unsubscribeUrl)}" style="color:#A3A19B">${esc(t.unsubscribe)}</a></td></tr>
 </table></td></tr></table></body></html>`;
-  const text = [t.heading(firstName ?? ''), '', t.body, ...(pickLines.length ? ['', t.picks + ':', ...pickLines] : []), '', t.note, '', `${t.unsubscribe}: ${unsubscribeUrl}`].join('\n');
+  const text = [t.heading(firstName ?? ''), '', t.body, ...(lines.length ? ['', t.picks + ':', ...lines] : []), '', t.note, '', `${t.unsubscribe}: ${unsubscribeUrl}`].join('\n');
   return { subject: t.subject, html, text };
 }
 
@@ -84,7 +87,7 @@ export function sendTeamNotice(signup: EmailSignup) {
   const lines = [
     `Email: ${signup.email}`, `Name: ${signup.firstName || '-'}`, `Province: ${signup.province || '-'}`,
     `Site: ${signup.siteLanguage} · ${signup.source}`,
-    `Picks: ${signup.picks.map(p => pickLine(p, 'en')).join('; ') || '-'}`,
+    `Picks: ${pickLines(signup.picks, 'en').join('; ') || '-'}`,
   ];
   return send({ to, subject: `New waitlist sign-up: ${signup.email}`, text: lines.join('\n') });
 }

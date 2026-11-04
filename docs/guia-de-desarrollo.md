@@ -129,16 +129,24 @@ Seguimos la guía *Cómo diseñar una base de datos correcta*. El diseño comple
   ```bash
   DATABASE_URL=<tu rama> node scripts/data-dictionary.ts
   ```
-- Las migraciones las corre el deploy (`scripts/release.ts`, antes del build), **nunca a mano en producción**.
+- Las migraciones las corre el deploy (`scripts/release.ts`, antes del build), **nunca a mano en producción**. En
+  Vercel, `MIGRATION_DATABASE_URL` va solo en *Production*; los previews usan `PREVIEW_MIGRATION_DATABASE_URL`, que
+  apunta a una rama de Neon, así que un PR nunca toca la base de producción.
+- El nombre de cada migración es `NNNN_nombre_en_minusculas.sql`. Si un archivo tiene otro nombre, o falta una migración
+  ya aplicada, el deploy se detiene.
 
 ## API y seguridad
 
 - Todo lo que llega del navegador se valida otra vez en el servidor (`lib/server/validate.ts`).
-- Las rutas `POST` rechazan peticiones de otros sitios (`sameOrigin`) y tienen límite por IP (`overLimit`).
+- Las rutas `POST` rechazan peticiones de otros sitios (`sameOrigin`) y tienen límite por IP (`overLimit`). La única
+  excepción a `sameOrigin` es `payment-callback`, porque la manda el banco desde su dominio: ahí lo que protege es la
+  firma del banco.
 - **Los precios nunca vienen del navegador.** El checkout los calcula con el catálogo y los compara con la base.
 - **No hay ni debe haber endpoints que lean o modifiquen órdenes.** El estado de una orden solo cambia con la respuesta
-  verificada del banco (`app/api/payment-callback`). La base además impide editar montos, retroceder estados o borrar
-  órdenes.
+  verificada del banco (`app/api/payment-callback`), y solo si el monto cobrado es el total de la orden. La base además
+  impide editar montos, agregar productos a una orden ya creada, crear órdenes ya pagadas, retroceder estados o borrar
+  órdenes, aunque se use el usuario del propio sitio.
+- Quien se dio de baja de la lista no vuelve a quedar suscrito porque alguien escriba su correo en el formulario.
 - Las claves (base de datos, Resend, banco) van solo en las variables de entorno de Vercel o en tu `.env.local`.
   **Nunca en el código ni en Git.**
 - El sitio solo carga scripts, fuentes e imágenes propios (Content Security Policy en `next.config.ts`). Si de verdad hace

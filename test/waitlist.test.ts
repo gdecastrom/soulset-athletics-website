@@ -126,3 +126,23 @@ test('unsubscribe link: GET asks, POST unsubscribes, bad tokens are refused', { 
   const [demand] = await sql`select count(*)::int as n from waitlist_pick_demand where product = 'creatine'`;
   assert.equal(demand.n, 0, 'unsubscribed people drop out of the demand view');
 });
+
+test('signing up again does not undo an unsubscribe, and sends nothing', { skip }, async () => {
+  const before = sent.length;
+  assert.equal((await post(signup())).status, 200);
+  assert.ok((await signupRow('athlete@email.com')).unsubscribed_at, 'still unsubscribed');
+  assert.equal(sent.length, before);
+});
+
+test('unsubscribe refuses cross-site posts', { skip }, async () => {
+  const { signId } = await import('../lib/server/unsubscribe-token.ts');
+  const url = `https://soulset.test/api/unsubscribe?id=1&t=${signId(1)}`;
+  assert.equal((await unsubscribe.POST(new Request(url, { method: 'POST', headers: { origin: 'https://evil.test' } }))).status, 403);
+});
+
+test('over-long fields are refused, not cut', { skip }, async () => {
+  const long = 'a'.repeat(250) + '@email.com';
+  assert.equal((await post(signup({ email: long }))).status, 400);
+  assert.equal((await post(signup({ email: 'long@email.com', firstName: 'x'.repeat(61) }))).status, 400);
+  assert.equal(await signupRow('long@email.com'), undefined);
+});

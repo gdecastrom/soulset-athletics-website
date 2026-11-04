@@ -49,11 +49,16 @@ export async function POST(request: Request) {
       const bySku = new Map(current.map(r => [r.sku, r]));
       for (const i of priced.items) if (bySku.get(i.sku)?.amount_cents !== i.listCents) throw new CatalogOutOfSync(i.sku);
 
+      /* Fills in what we don't know yet but never overwrites: anyone can type someone else's email here. The order keeps
+         its own copy of the delivery details. */
       const [cust] = await tx<{ id: number }[]>`
         insert into customer (email, first_name, last_name, phone, province_id)
         values (${email}, ${c.firstName}, ${c.lastName}, ${c.phone}, (select id from province where name = ${c.province}))
         on conflict (email) do update set
-          first_name = excluded.first_name, last_name = excluded.last_name, phone = excluded.phone, province_id = excluded.province_id
+          first_name  = coalesce(customer.first_name, excluded.first_name),
+          last_name   = coalesce(customer.last_name, excluded.last_name),
+          phone       = coalesce(customer.phone, excluded.phone),
+          province_id = coalesce(customer.province_id, excluded.province_id)
         returning id`;
       const [o] = await tx<OrderRow[]>`
         insert into sales_order (customer_id, currency, subtotal_cents, shipping_cents, total_cents, site_language,

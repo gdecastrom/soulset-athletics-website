@@ -12,6 +12,8 @@ test('re-running migrations is a no-op, and an edited migration stops the deploy
     assert.deepEqual(logs, ['migrations: up to date']);
     await sql`update schema_migration set checksum = 'edited' where name = '0001_initial.sql'`;
     await assert.rejects(migrate(sql, () => {}), /was edited after it was applied/);
+    await sql`insert into schema_migration (name, checksum) values ('0002_deleted.sql', 'x')`;
+    await assert.rejects(migrate(sql, () => {}), /missing from db\/migrations: 0002_deleted\.sql/);
   } finally {
     await sql.end();
   }
@@ -24,7 +26,7 @@ test('every table and column is documented in the schema', { skip }, async () =>
       select c.relname || coalesce('.' || a.attname, '') as name
       from pg_class c join pg_namespace n on n.oid = c.relnamespace
       left join pg_attribute a on a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
-      where n.nspname = 'public' and c.relkind = 'r' and c.relname <> 'schema_migration'
+      where n.nspname = 'public' and c.relkind = 'r'
         and (obj_description(c.oid) is null or col_description(c.oid, a.attnum) is null)`;
     assert.deepEqual(missing.map(m => m.name), []);
   } finally {

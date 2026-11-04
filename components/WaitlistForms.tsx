@@ -37,7 +37,7 @@ export function NewsForm({ lang }: { lang: Lang }) {
     <div>
       <form id="newsForm" noValidate onSubmit={submit}>
         <label className="sr" htmlFor="newsEmail">{t.news.label}</label>
-        <input id="newsEmail" type="email" placeholder={t.news.placeholder} autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} />
+        <input id="newsEmail" type="email" maxLength={254} placeholder={t.news.placeholder} autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} />
         <button className="btn btn-primary" type="submit" disabled={busy}>{t.news.button}</button>
       </form>
       <p className="news-msg" role="status" style={msg ? { color: msg.color } : undefined}>{msg?.text}</p>
@@ -125,14 +125,14 @@ export function WaitlistForm({ lang }: { lang: Lang }) {
           <legend className="sr">{w.details}</legend>
           <div className="f">
             <label htmlFor="wlEmail">{w.email}</label>
-            <input className="input" id="wlEmail" name="email" type="email" autoComplete="email" required placeholder={t.news.placeholder}
+            <input className="input" id="wlEmail" name="email" type="email" maxLength={254} autoComplete="email" required placeholder={t.news.placeholder}
               aria-invalid={emailErr ? true : undefined} value={email} onChange={e => { setEmail(e.target.value); setEmailErr(''); }} />
             <span className="err">{emailErr}</span>
           </div>
           <div className="row2">
             <div className="f">
               <label htmlFor="wlFirst">{w.firstName}</label>
-              <input className="input" id="wlFirst" name="firstName" autoComplete="given-name" value={firstName} onChange={e => setFirstName(e.target.value)} />
+              <input className="input" id="wlFirst" name="firstName" maxLength={60} autoComplete="given-name" value={firstName} onChange={e => setFirstName(e.target.value)} />
             </div>
             <div className="f">
               <label htmlFor="wlProvince">{w.province}</label>

@@ -16,7 +16,8 @@ the database.
   `db/migrations/`; never edit an applied migration. Every table and column gets a `comment on`, every FK an index and a
   deliberate `ON DELETE` (no reflexive cascades), grants for `soulset_app` in the same migration. Regenerate
   `docs/data-dictionary.md` with `scripts/data-dictionary.ts`.
-- API: validate on the server (`lib/server/validate.ts`), `sameOrigin` + `overLimit` on POST routes, prices only from
+- API: validate on the server (`lib/server/validate.ts`), `sameOrigin` + `overLimit` on POST routes (`payment-callback`
+  skips `sameOrigin` because the gateway posts it, and checks the gateway's signature instead), prices only from
   the catalogue. Never add endpoints that read, edit or delete orders. Server code stays in `lib/server/`.
 - Secrets only in environment variables; never in code or Git.
 

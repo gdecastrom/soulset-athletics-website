@@ -5,7 +5,7 @@
 
 create extension if not exists btree_gist;   -- for the no-overlap rule on variant_price
 
-create function set_updated_at() returns trigger language plpgsql as $$
+create function set_updated_at() returns trigger language plpgsql set search_path = public, pg_temp as $$
 begin
   new.updated_at = now();
   return new;
@@ -267,7 +267,7 @@ create table sales_order_item (
   sales_order_id   bigint not null references sales_order (id) on delete restrict,
   variant_id       bigint not null references variant (id) on delete restrict,
   quantity         integer not null check (quantity between 1 and 99),
-  unit_price_cents integer not null check (unit_price_cents >= 0),
+  unit_price_cents integer not null check (unit_price_cents > 0),
   is_subscription  boolean not null default false,
   created_at       timestamptz not null default now(),
   unique (sales_order_id, variant_id, is_subscription)
@@ -286,7 +286,7 @@ create table payment_event (
   payment_provider text not null check (payment_provider in ('azul', 'cardnet', 'test')),
   status           text not null check (status in ('paid', 'declined', 'cancelled', 'error', 'unverified')),
   verified         boolean not null,
-  payload          jsonb not null,
+  payload          jsonb not null check (pg_column_size(payload) <= 8192),
   created_at       timestamptz not null default now(),
   check (verified = (status <> 'unverified')),
   check (verified = (sales_order_id is not null))
@@ -294,7 +294,7 @@ create table payment_event (
 create index payment_event_sales_order_id on payment_event (sales_order_id);
 comment on table payment_event is 'Every callback from a payment gateway, verified or not, for support and reconciliation. Append-only (no updated_at).';
 comment on column payment_event.sales_order_id is 'NULL when the callback could not be verified: its order id can''t be trusted.';
-comment on column payment_event.payload is 'Raw data sent by the gateway. JSON on purpose: it has no fixed structure and is never filtered on.';
+comment on column payment_event.payload is 'Raw data sent by the gateway, at most 8 kB. JSON on purpose: it has no fixed structure and is never filtered on.';
 comment on column payment_event.payment_provider is 'Gateway that sent the callback.';
 comment on column payment_event.status is 'Result reported by the gateway, or unverified when its signature or lookup failed.';
 comment on column payment_event.verified is 'True if the result was confirmed with the gateway.';
@@ -303,11 +303,12 @@ comment on column payment_event.verified is 'True if the result was confirmed wi
 
 create table rate_limit_hit (
   id         bigint generated always as identity primary key,
-  bucket     text not null check (bucket in ('waitlist', 'checkout')),
+  bucket     text not null check (bucket in ('waitlist', 'checkout', 'unsubscribe', 'payment_callback')),
   ip_hash    text not null check (ip_hash ~ '^[0-9a-f]{64}$'),
   created_at timestamptz not null default now()
 );
 create index rate_limit_hit_lookup on rate_limit_hit (bucket, ip_hash, created_at);
+create index rate_limit_hit_created_at on rate_limit_hit (created_at);   -- for deleting old rows
 comment on table rate_limit_hit is 'One row per request to a rate-limited endpoint. Rows older than a day are deleted. Never updated (no updated_at).';
 comment on column rate_limit_hit.ip_hash is 'SHA-256 of the client IP salted with APP_SECRET. Raw IPs are never stored.';
 comment on column rate_limit_hit.bucket is 'Endpoint the request was for.';
@@ -344,7 +345,7 @@ create trigger set_updated_at before update on waitlist_pick for each row execut
 create trigger set_updated_at before update on sales_order for each row execute function set_updated_at();
 
 -- A price is history: only closing it (setting valid_to once) is allowed.
-create function variant_price_guard() returns trigger language plpgsql as $$
+create function variant_price_guard() returns trigger language plpgsql set search_path = public, pg_temp as $$
 begin
   if tg_op = 'DELETE' then
     raise exception 'variant_price rows are never deleted';
@@ -359,7 +360,7 @@ create trigger variant_price_guard before update or delete on variant_price for 
 
 -- Orders can't be tampered with, even through a bug in the app or with the app's own login: after creation only the
 -- payment fields change, the status only moves forward, and orders are never deleted.
-create function sales_order_guard() returns trigger language plpgsql as $$
+create function sales_order_guard() returns trigger language plpgsql set search_path = public, pg_temp as $$
 begin
   if tg_op = 'DELETE' then
     raise exception 'orders are never deleted (order %)', old.order_number;
@@ -385,8 +386,31 @@ begin
 end $$;
 create trigger sales_order_guard before update or delete on sales_order for each row execute function sales_order_guard();
 
+-- A new order always starts pending and unpaid, stamped with the time of the transaction that creates it.
+create function sales_order_new() returns trigger language plpgsql set search_path = public, pg_temp as $$
+begin
+  if new.status <> 'pending' or new.paid_at is not null or new.provider_reference is not null then
+    raise exception 'a new order must be pending, unpaid and without a payment reference';
+  end if;
+  new.created_at := now();
+  new.updated_at := now();
+  return new;
+end $$;
+create trigger sales_order_new before insert on sales_order for each row execute function sales_order_new();
+
+-- Items are written with their order, in the same transaction, and never added later: now() is the start time of
+-- the current transaction, and sales_order_new stamps every order with it.
+create function sales_order_item_new() returns trigger language plpgsql set search_path = public, pg_temp as $$
+begin
+  if not exists (select 1 from sales_order where id = new.sales_order_id and created_at = now()) then
+    raise exception 'items can only be added in the transaction that creates order %', new.sales_order_id;
+  end if;
+  return new;
+end $$;
+create trigger sales_order_item_new before insert on sales_order_item for each row execute function sales_order_item_new();
+
 -- An order has at least one item and its subtotal matches them. Checked at commit, after the items are inserted.
-create function sales_order_totals() returns trigger language plpgsql as $$
+create function sales_order_totals() returns trigger language plpgsql set search_path = public, pg_temp as $$
 declare
   order_id bigint;
   items integer;
@@ -408,7 +432,7 @@ create constraint trigger sales_order_totals after insert on sales_order deferra
 create constraint trigger sales_order_totals after insert on sales_order_item deferrable initially deferred
   for each row execute function sales_order_totals();
 
-create function append_only() returns trigger language plpgsql as $$
+create function append_only() returns trigger language plpgsql set search_path = public, pg_temp as $$
 begin
   raise exception '% is append-only', tg_table_name;
 end $$;
@@ -441,6 +465,8 @@ begin
 end $$;
 
 grant usage on schema public to soulset_app;
+-- No one needs temporary tables, and they could shadow real ones in queries without a schema.
+do $$ begin execute format('revoke temporary on database %I from public', current_database()); end $$;
 grant select on province, category, product, product_option, option_value, variant, variant_option_value, variant_price to soulset_app;
 grant select, insert on customer to soulset_app;
 grant update (first_name, last_name, phone, province_id) on customer to soulset_app;

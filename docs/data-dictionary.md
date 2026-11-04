@@ -55,7 +55,7 @@ Every callback from a payment gateway, verified or not, for support and reconcil
 | `payment_provider` | text | no |  | CHECK | Gateway that sent the callback. |
 | `status` | text | no |  | CHECK | Result reported by the gateway, or unverified when its signature or lookup failed. |
 | `verified` | boolean | no |  | CHECK | True if the result was confirmed with the gateway. |
-| `payload` | jsonb | no |  |  | Raw data sent by the gateway. JSON on purpose: it has no fixed structure and is never filtered on. |
+| `payload` | jsonb | no |  | CHECK | Raw data sent by the gateway, at most 8 kB. JSON on purpose: it has no fixed structure and is never filtered on. |
 | `created_at` | timestamp with time zone | no | now() |  | When the row was created (UTC). |
 
 ## product

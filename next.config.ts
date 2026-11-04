@@ -4,7 +4,8 @@ const dev = process.env.NODE_ENV !== 'production';
 
 /* Content Security Policy: the site only loads its own scripts, styles, fonts and images, and only sends data to itself.
    When checkout opens, add the payment provider's hosted-page origin to PAYMENT_FORM_ORIGINS (space-separated)
-   so the browser is allowed to post the payment form there. */
+   so the browser is allowed to post the payment form there. Headers are fixed at build time: redeploy after changing it.
+   script-src needs 'unsafe-inline' because pre-rendered pages carry Next.js's inline scripts without nonces. */
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ''}`,

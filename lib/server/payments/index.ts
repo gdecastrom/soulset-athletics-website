@@ -18,7 +18,9 @@ export type Provider = {
   verifyCallback(request: Request): Promise<PaymentResult> | PaymentResult;
 };
 export type PaymentStart = { redirectUrl: string } | { form: { action: string; fields: Record<string, string> } };
-export type PaymentResult = { orderId: number; status: PaymentStatus; reference: string; payload: Record<string, unknown> };
+/* amountCents and currency are what the provider says was charged; a 'paid' result that doesn't match the order's
+   total is treated as an error. */
+export type PaymentResult = { orderId: number; status: PaymentStatus; reference: string; amountCents: number; currency: string; payload: Record<string, unknown> };
 
 const PROVIDERS: Record<string, Provider> = { azul, cardnet, test: fake };
 

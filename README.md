@@ -33,7 +33,7 @@ Orders aren't open yet. Visitors browse the line-up, use the Fuel Planner and bu
 The waitlist form and the home page box `POST` to `/api/waitlist` (`app/api/waitlist/route.ts`), which:
 
 1. validates everything again on the server (email, known province, known products, size limits), refuses cross-site requests and rate-limits each IP to 5 requests per 10 minutes;
-2. saves it as a `customer`, a `waitlist_signup` and the cart as `waitlist_pick` rows (one per product variant). Signing up again with the same email updates the same rows instead of creating duplicates;
+2. saves it as a `customer`, a `waitlist_signup` and the cart as `waitlist_pick` rows (one per product variant). Signing up again with the same email updates the same rows instead of creating duplicates, but never undoes an unsubscribe (anyone can type an email into the form). To come back, the person writes to us and we clear `unsubscribed_at` in the Neon SQL editor;
 3. emails a confirmation in the visitor's language through Resend, with an unsubscribe link (`/api/unsubscribe`, signed so nobody can unsubscribe someone else), and optionally a short notice to the team (`NOTIFY_EMAIL`).
 
 If email isn't configured yet, sign-ups are still saved. Useful queries (Neon SQL editor):
@@ -59,8 +59,8 @@ select * from waitlist_pick_demand;   -- which variants people want most
 - **No way to edit orders from the internet.** The only order endpoints are `/api/checkout`, which can only *create* a pending order, and `/api/payment-callback`, which only accepts results it can verify with the payment provider. Nothing reads or updates an order by id from the browser, and the order page never reads the database.
 - **Prices come from the server.** Totals are computed from `lib/catalog-data.ts`; whatever price the browser sends is ignored.
 - **The database enforces it too.** Triggers refuse any change to an order's amounts, customer or delivery details after it's created, allow status changes only forward (`pending` → `paid` / `declined` / `cancelled` / `error`, `paid` → `refunded`), check that an order's subtotal matches its items, and refuse deletes. Order items, payment events and prices are append-only. This holds even with a bug in the app.
-- **Least-privilege database login.** The migrations create `soulset_app`, which can add rows and update only the columns the site needs: no deletes (except a wishlist's picks), no schema changes, can't disable the triggers. The site uses that role; the owner login is only for deploys and for the team in the Neon console.
-- **Headers.** A strict Content Security Policy (own scripts, styles, fonts and images only), HSTS, `X-Frame-Options: DENY`, `nosniff`, and no indexing of `/api` or preview deployments.
+- **Least-privilege database login.** The migrations create `soulset_app`, which can add rows and update only the columns the site needs: no deletes except a wishlist's picks and old rate-limit rows, no schema changes, no temporary tables, can't disable the triggers. The site uses that role; the owner login is only for deploys and for the team in the Neon console.
+- **Headers.** A Content Security Policy that only allows the site's own scripts, styles, fonts and images (inline scripts are allowed because Next.js needs them without nonces on pre-rendered pages), HSTS, `X-Frame-Options: DENY`, `nosniff`, and no indexing of `/api` or preview deployments.
 - **Card data never touches the site**: Azul and CardNet both offer hosted payment pages.
 
 ## Run locally
@@ -85,11 +85,11 @@ TEST_DATABASE_URL=postgres://… npm test   # drops and rebuilds that database's
 
 1. **Project.** Import the GitHub repository in Vercel (framework: Next.js, defaults are fine).
 2. **Database.** Create a Neon project (or *Storage* → *Create database* → **Neon** in Vercel).
-   1. Set `MIGRATION_DATABASE_URL` to the owner's connection string. Every build runs `scripts/release.ts` first: pending migrations, then the catalogue sync.
+   1. Set `MIGRATION_DATABASE_URL` to the owner's connection string, for the **Production** environment only. Every build runs `scripts/release.ts` first: pending migrations, then the catalogue sync.
    2. After the first deploy, give the site's login a password once, in the Neon SQL editor: `alter role soulset_app login password '…';`
    3. Set `DATABASE_URL` to the `soulset_app` connection string (use the `-pooler` host).
-   4. Give preview deployments their own Neon branch so tests on previews never touch real sign-ups or orders.
-3. **Secret.** Add `APP_SECRET` (`openssl rand -base64 32`). Don't change it later: it signs the unsubscribe links already sent.
+   4. Give preview deployments their own Neon branch so tests on previews never touch real sign-ups or orders: set `PREVIEW_MIGRATION_DATABASE_URL` (that branch's owner) and a `DATABASE_URL` for the branch, both for **Preview** only. Preview builds never read `MIGRATION_DATABASE_URL`, so they can't migrate production.
+3. **Secret.** Add `APP_SECRET` (`openssl rand -base64 32`), a different one for Production and for Preview. Don't change the production one later: it signs the unsubscribe links already sent.
 4. **Resend.** Verify the domain in Resend (DNS records at your registrar), create an API key, then set `RESEND_API_KEY`, `EMAIL_FROM` (e.g. `Soulset Athletics <hola@soulsetathletics.com>`), and optionally `EMAIL_REPLY_TO` and `NOTIFY_EMAIL`.
 5. **Domain.** Add the custom domain in Vercel → *Domains* and set `SITE_URL` to it, so canonical links, the sitemap, social previews and email links use it.
 
