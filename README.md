@@ -79,7 +79,7 @@ npm run build
 TEST_DATABASE_URL=postgres://… npm test   # drops and rebuilds that database's schema: use a throwaway one
 ```
 
-`npm test` runs the catalogue, copy and planner checks, plus the API tests against a real Postgres when `TEST_DATABASE_URL` is set. To prove the restricted role is enough, set `TEST_ADMIN_DATABASE_URL` to the owner and `TEST_DATABASE_URL` to `soulset_app`. Tests need Node 22.18 or newer.
+`npm test` runs the catalogue, copy and planner checks, plus the API tests against a real Postgres when `TEST_DATABASE_URL` is set. To prove the restricted role is enough, set `TEST_ADMIN_DATABASE_URL` to the owner and `TEST_DATABASE_URL` to `soulset_app`. Building and testing need Node 22.18 or newer on the 22 line (`.nvmrc`), because the `.ts` scripts run directly on Node.
 
 ## Deploy on Vercel
 

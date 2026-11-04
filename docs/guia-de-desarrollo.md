@@ -36,7 +36,7 @@ Los archivos viejos ya no existen. Pasa cada cambio a su lugar nuevo:
 
 ## Levantar el proyecto en tu computadora
 
-Necesitas Git y **Node 22.18 o más nuevo**.
+Necesitas Git y **Node 22** (22.18 o más nuevo), la misma versión que usa Vercel. Si usas `nvm`, `nvm use` toma la versión de `.nvmrc`. Con una versión anterior a 22.18 fallan `npm run build` y `npm test`, porque los scripts `.ts` se ejecutan directamente con Node.
 
 ```bash
 git clone https://github.com/gdecastrom/soulset-athletics-website.git
