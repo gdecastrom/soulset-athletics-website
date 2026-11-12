@@ -1,0 +1,11 @@
+/* Coming-soon cover: the home page's track photo under a dark wash, the rule and the name centred on top. */
+html, body { margin:0; background:#0A0A0A; }
+.cover { position:relative; min-height:100vh; min-height:100svh; display:grid; place-items:center; overflow:hidden; color:#F2F0EB;
+  font-family:var(--font-saira),"Arial Narrow","Helvetica Neue Condensed",sans-serif; font-weight:900; text-transform:uppercase; text-align:center; }
+.cover-img { object-fit:cover; object-position:50% 25%; }
+.cover::after { content:""; position:absolute; inset:0; background:rgba(10,10,10,.55); }
+.cover-in { position:relative; z-index:1; display:grid; gap:clamp(16px,2.4vw,28px);
+  padding:24px max(20px, env(safe-area-inset-right, 0px)) 24px max(20px, env(safe-area-inset-left, 0px)); }
+.cover h1 { margin:0; font-weight:900; font-size:clamp(64px,12vw,176px); line-height:.86; }
+.cover .gt { color:#FF5A1F; }
+.cover p { margin:0; font-size:clamp(18px,2vw,28px); letter-spacing:.12em; }
