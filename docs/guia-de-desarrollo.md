@@ -74,6 +74,20 @@ lista de espera guarde de verdad necesitas una base de datos:
 
 Sin `RESEND_API_KEY` no se mandan correos, pero los registros se guardan igual.
 
+## Dominios
+
+| Dirección | Qué muestra |
+|---|---|
+| `soulsetathletics.com` y `www.` | Solo la portada "coming soon": la foto de la pista, "Mentalidad > Todo" y el nombre. En el idioma del navegador; `/es` y `/en` la fuerzan. Cualquier otra ruta (`/shop`…) redirige a la misma ruta en `web.` |
+| `web.soulsetathletics.com` | El sitio completo. Antes del lanzamiento no aparece en Google (`X-Robots-Tag: noindex`). |
+| `*.vercel.app`, `localhost` | El sitio completo. |
+
+- La portada vive en `app/landing/[lang]/` (layout propio, sin header, footer ni carrito); qué dirección ve qué está en
+  `lib/hosts.ts` y `proxy.ts`, con sus pruebas en `test/hosts.test.ts`.
+- En tu computadora, abre http://soulsetathletics.localhost:3000 para ver la portada y http://localhost:3000 para el sitio.
+- En Vercel, `SITE_URL` va con `https://web.soulsetathletics.com`: los links de los correos y el sitemap apuntan al sitio.
+- Para lanzar la tienda en el dominio principal basta con quitar `soulsetathletics.com` y `www.` de `LANDING_HOSTS`.
+
 ## Dónde se cambia cada cosa
 
 ### Textos de la interfaz
